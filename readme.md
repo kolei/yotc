@@ -2,4 +2,7 @@
 
 ## WorldSkills Программные решения для бизнеса
 
-* [учебник по MySQL (и не только)](docs/Учебник%20с%20примерами%20MySql,%20MS%20SQL%20Server%20and%20Oracle%20by%20examples%20(Svyatoslav%20Kulikov).pdf)
+* [Подготовка к демо-экзамену по компетенции "Программные решения для бизнеса"](articles/task.md)
+
+* "Учебник с примерами MySql, MS SQL Server and Oracle by examples (Svyatoslav Kulikov).pdf" (см. в каталоге **docs** этого репозитория) 
+
