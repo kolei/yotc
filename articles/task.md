@@ -339,6 +339,9 @@ DELETE FROM название_таблицы
         FROM stroy_material 
         WHERE sklad_num = 1;
     ```
+
+Для закрепления материала пройдитесь по урокам в [онлайн тренажере](https://sql-academy.org/ru/trainer?sort=byIncreasingDifficulty). Там же можно почитать Учебник.
+
 ## Импорт данных
 
 Стандартом *де-факто* для импорта/экспорта данных является формат CSV.
