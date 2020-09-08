@@ -474,3 +474,12 @@ CSV расшифровывается как comma-separated values — «зна�
     В Навигаторе переключитесь, если нужно, в режим работы со схемой
 
     ![](../img/task011.png)
+
+
+[CREATE DATABASE IF NOT EXISTS ekolesnikov CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;]: _
+
+[CREATE USER 'ekolesnikov'@'%' IDENTIFIED BY '123456';]: _
+
+[GRANT ALL PRIVILEGES ON ekolesnikov . * TO 'ekolesnikov'@'%';]: _
+
+[FLUSH PRIVILEGES;]: _
