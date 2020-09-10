@@ -482,6 +482,10 @@ CSV расшифровывается как comma-separated values — «зна�
 
 1. Установите [Microsoft Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/ru/vs/community/)
 
+    Устанавливать нужно только "Классические приложения .NET"
+
+    //TODO добавить скрин - что именно ставить
+
 2. Создайте первое приложение [Hello World](https://docs.microsoft.com/ru-ru/visualstudio/get-started/csharp/tutorial-wpf?view=vs-2019)
 
     >В руководстве нет картинок - компенсирую:
@@ -499,6 +503,54 @@ CSV расшифровывается как comma-separated values — «зна�
     ![](../img/task014.png)
 
 3. Подробнее о C# https://metanit.com/sharp/tutorial/
+
+4. Подключение к MySql
+
+    Коннектор из комплекта MySql installer не работает. Нужно добавить пакет от NuGet. 
+    
+    Запустите консоль, перейдите в каталог с проектом (туда, где находится файл *.csproj) и выполните команду:
+
+    ```
+    dotnet add package MySql.Data --version 8.0.21
+    ```
+
+    В следующем примере (консольное приложение) производится подключение к базе и выполнение SQL-запроса:
+
+    ```c#
+    using System;
+    using System.Data.Common;
+    using MySql.Data.MySqlClient;
+
+    namespace ConsoleApp3
+    {
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                Console.WriteLine("Hello World!");
+                MySqlConnection conn = new MySqlConnection("server=192.168.1.53;user=ekolesnikov;password=123456;database=ekolesnikov");
+                conn.Open();
+
+                MySqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = "SHOW TABLES";
+
+                // DbDataReader находится в пространстве имен System.Data.Common
+                DbDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                    while (reader.Read())
+                        Console.WriteLine(reader.GetValue(0));
+            }
+        }
+    }
+    ```
+
+    Программа выведет список таблиц в нашей базе:
+
+    ```
+    sklad
+    stroy_material
+    ```
 
 [CREATE DATABASE IF NOT EXISTS ekolesnikov CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;]: _
 
