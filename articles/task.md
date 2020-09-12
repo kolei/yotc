@@ -1,6 +1,6 @@
 [задание взято отсюда]: https://docplayer.ru/49945157-Zadaniya-demonstracionnogo-ekzamena-kompetenciya-programmirovanie-v-kompyuternyh-sistemah-specialnost-programmirovanie-v-kompyuternyh-sistemah.html
 
->Скринкаст: Подготовка к демо-экзамену по компетенции "Программные решения для бизнеса"
+>[Скринкаст: Подготовка к демо-экзамену по компетенции "Программные решения для бизнеса"](https://lawreps-my.sharepoint.com/:f:/g/personal/zy691_nig3_a1p_me/EtAw5Adn5-JEsCa_16SIRSABDyllhE5-pOsH94pMDtcLrQ?e=5VtQq7)
 >
 >
 >![](../img/qr-screencast.png)
