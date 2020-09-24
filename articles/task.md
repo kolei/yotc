@@ -813,6 +813,15 @@ CSV расшифровывается как comma-separated values — «зна�
     >   // теперь осталось только проверить есть ли рядом пустые ячейки и методами Grid.SetColumn и Grid.SetRow переместить кнопку. Это будет задание на дом.
     >}
     >```
+    >
+    >Все элементы сетки находятся в коллекции *Children*, перебрать ее можно с помощью **foreach**:
+    >
+    >```c#
+    >foreach(Button element in MainGrid.Children)
+    >{
+    >   //тут пишете код 
+    >}
+    >```
 
 ### Расшифровка скринкаста ч2
 
@@ -825,7 +834,10 @@ CSV расшифровывается как comma-separated values — «зна�
     Добавим в *StackPanel* слайдер (ползунок), задав ему название, минимальное и максимальное значения:
 
     ```xml
-    <Slider Minimum="10" Maximum="100" Name="MySlider"/>
+    <Slider 
+        Minimum="10" 
+        Maximum="100" 
+        Name="MySlider"/>
     ```
 
     И в заголовке окна (Title) вместо MainWindow напишем следующее:
@@ -913,7 +925,9 @@ CSV расшифровывается как comma-separated values — «зна�
     Добавим в третью колонку компонент Frame:
 
     ```xml
-        <Frame x:Name="MainFrame" Grid.Column="2" Background="GreenYellow"/>
+        <Frame x:Name="MainFrame" 
+            Grid.Column="2" 
+            Background="GreenYellow"/>
     </Grid>
     ```
 
@@ -988,7 +1002,10 @@ CSV расшифровывается как comma-separated values — «зна�
     А во Frame добавить атрибут NavigationUIVisibility="Hidden"
 
     ```xml
-    <Frame x:Name="MainFrame" Grid.Column="2" Background="GreenYellow" NavigationUIVisibility="Hidden"/>
+    <Frame x:Name="MainFrame" 
+        Grid.Column="2" 
+        Background="GreenYellow" 
+        NavigationUIVisibility="Hidden"/>
     ```
 
 14. ListView
@@ -1030,10 +1047,13 @@ CSV расшифровывается как comma-separated values — «зна�
     Можно изменить отображение элементов списка, для этого нужно реализовать внутри тега ListView шаблон:
 
     ```xml
-    <ListView x:Name="MainListView" Grid.Column="1" ItemsSource="{Binding MyElements}">
+    <ListView x:Name="MainListView" 
+        Grid.Column="1" 
+        ItemsSource="{Binding MyElements}">
         <ListView.ItemTemplate>
             <DataTemplate>
-                <Label Content="{Binding}" Background="Beige"/>
+                <Label Content="{Binding}" 
+                    Background="Beige"/>
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>
@@ -1047,7 +1067,8 @@ CSV расшифровывается как comma-separated values — «зна�
     <DataTemplate>
         <StackPanel Orientation="Horizontal">
             <Label Content="Название"/>
-            <Label Content="{Binding}" Background="Beige"/>
+            <Label Content="{Binding}" 
+                Background="Beige"/>
         </StackPanel>
     </DataTemplate>
     ```
@@ -1056,7 +1077,8 @@ CSV расшифровывается как comma-separated values — «зна�
 
     ```xml
     <Grid>
-        <Label Name="ApplicationLabel" Content="NoName"/>
+        <Label Name="ApplicationLabel" 
+            Content="NoName"/>
     </Grid>
     ```
 
