@@ -449,7 +449,10 @@ CSV расшифровывается как comma-separated values — «зна�
 
 ## SQL Server Management Studio
 
-Скачать можно [тут](https://docs.microsoft.com/ru-ru/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15)
+Скачайте и установите MS SQL Express:
+https://www.microsoft.com/ru-ru/sql-server/sql-server-downloads
+
+Скачайте и установите SQL Server Management Studio: https://docs.microsoft.com/ru-ru/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15
 
 
 1. Подключение к серверу
