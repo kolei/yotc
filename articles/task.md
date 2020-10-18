@@ -26,6 +26,7 @@
 * [Программирование](#Программирование)
     * [Расшифровка скринкаста ч2](#Расшифровка-скринкаста-ч2)
     * [Расшифровка скринкаста ч3 (ORM)](#Расшифровка-скринкаста-ч3-ORM)
+    * [Расшифровка скринкаста ч.4](#Расшифровка-скринкаста-ч.4)
 * ~~Реализация отчетов~~
 * ~~Проектирование архитектуры~~
 * Тестирование
@@ -1636,11 +1637,269 @@ Core.DB.SaveChanges();
 
 Теперь добавление произойдет только для нового объекта (все свойства новых объектов пустые)
 
+**Задание:**
+
+Создать отдельное **окно**, реализующее CRUD для таблицы складов
+
+>**CRUD** — акроним, обозначающий четыре базовые функции, используемые при работе с базами данных: *создание* (англ. create), *чтение* (read), *модификация* (update), *удаление* (delete).
+
+---
+
+### Расшифровка скринкаста ч.4
+
+#### Небольшие лайфхаки для индикации режима редактирования
+
+1. Простой вариант, отображающий только режим *редактирования* (в режиме *добавления* новой записи ничего не отображается). 
+
+    В разметку страницы *AddMaterial* вставьте метку (**Label**), свойство *Opacity* которого связано с номером склада
+
+    ```xml
+    ...
+    <StackPanel>
+       <Label 
+           Opacity="{Binding CurrentStroyMaterial.Num}"
+           Background="Yellow"
+           Content="Редактирование"/>
+    ...
+    ```
+
+    *Opacity* примерно переводится как "непрозрачность" и принимает значения 0..1 (все что больше 1 считается =1). Как мы помним, у нового объекта поле Num = 0, а у существующего >=1. 
+    
+    Таким образом, в режиме редактирования метка будет видна, а в режиме добавления новой записи нет.
+
+2. Продвинутый вариант.
+
+    ```xml
+    <!-- метка по-умолчанию в режиме редактирования -->
+    <Label 
+        Content="Редактирование" 
+        Background="Yellow">
+        <!-- далее к метке применяются стили -->
+        <Label.Style>
+            <Style 
+                TargetType="Label">
+                <!-- и новая для нас сущность: триггер, т.е. стиль срабатывает только при выполнении какого-то условия -->
+                <Style.Triggers>
+                    <!-- условие: у поля "номер" значение (value) = 0 -->
+                    <DataTrigger 
+                        Binding="{Binding CurrentStroyMaterial.Num}" 
+                        Value="0">
+                        <!-- дальше Setter, который меняет какое-то свойство. В нашем случае шаблон метки -->
+                        <Setter
+                            Property="Label.ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <ContentPresenter
+                                        Content="Добавление"/>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Label.Style>
+    </Label>
+    ```
+
+---
+
+#### Отображение данных в табличном виде
+
+1. Добавьте в проект новую станицу (**Page**) StroyMaterialPage.
+
+2. В разметке основного окна добавьте кнопку:
+
+    ```xml
+    <Button 
+        Content="Таблица стройматериалов" 
+        Name="StroyMaterialTableButton" 
+        Click="StroyMaterialTableButton_Click"/>
+    ```
+
+3. В коде главного окна в обработчике *StroyMaterialTableButton_Click* сделайте навигацию на новую страницу:
+
+    ```cs
+    private void StroyMaterialTableButton_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate( new StroyMaterialPage(MyElements) );
+    }
+    ```
+
+    Тут, чтобы не плодить сущности, мы в создаваемую страницу передаем список стройматериалов. Соответственно, в конструкторе страницы *StroyMaterialPage* мы должны описать этот параметр и сохранить его в свойстве класса (напоминаю, DataContext привязан к конкретному экземпляру класса)
+
+    ```cs
+    public partial class StroyMaterialPage : Page
+    {
+        public List<StroyMaterial> MyStroyMaterials { get; set; }
+
+        public StroyMaterialPage(List<StroyMaterial> materials)
+        {
+            InitializeComponent();
+            MyStroyMaterials = materials;
+            this.DataContext = this;
+        }
+    }
+    ```
+
+4. В разметку страницы *StroyMaterialPage* добавляем компонент **DataGrid**
+
+    ```xml
+    <Grid>
+        <DataGrid ItemsSource="{Binding MyStroyMaterials}"/>
+    </Grid>
+    ```
+
+    Если все сделано правильно, то при клике по кнопке "Таблица стройматериалов" во Frame (третья ячейка сетки) будет выведено содержимое таблицы:
+
+    ![](../img/task079.png)
+
+    Видим, что информация о складе выводится не в том виде, который нам нужен. Добавляем в **DataGrid** описание для колонки *Склад*
+
+    ```xml
+    <DataGrid.Columns>
+        <DataGridTextColumn 
+            Header="Склад" 
+            Binding="{Binding Sklad.Adress}"/>
+    </DataGrid.Columns>
+    ```
+
+    ![](../img/task080.png)
+
+    Чтобы убрать ненужные колонки нужно запретить автоматическую генерацию колонок и вручную добавить те, которые нам нужны:
+
+    ```xml
+    <DataGrid 
+        ItemsSource="{Binding MyStroyMaterials}" 
+        AutoGenerateColumns="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn 
+                Header="Название" 
+                Binding="{Binding Title}"/>
+            <DataGridTextColumn 
+                Header="Склад" 
+                Binding="{Binding Sklad.Adress}"/>
+        </DataGrid.Columns>
+    </DataGrid>
+    ```
+
+5. Следующая задача, которую часто приходится делать, вывести в каждой строке таблицы кнопки для Редактирования/Удаления. Для добавления произвольных колонок в таблицу служит тег *DataGridTemplateColumn*, у него также есть атрибут заголовок (Header) и шаблон для содержимого (напоминаю, что DataTemplate может содержать только один дочерний элемент)
+
+    ```xml
+    <DataGridTemplateColumn Header="Действия">
+        <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Удалить"/>
+                    <Button Content="редактировать"/>
+                </StackPanel>
+            </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>    
+    </DataGridTemplateColumn>
+    ```
+
+    Чтобы обработать нажатия на эти кнопки нужно дать им названия и назначить обработчики событий, и, заодно, дать название DataGrid-у. Итоговая разметка будет примерно такой:
+
+    ```xml
+    <DataGrid 
+        ItemsSource="{Binding MyStroyMaterials}" 
+        AutoGenerateColumns="False" 
+        Name="SMDataGrid">
+        <DataGrid.Columns>
+            <DataGridTextColumn 
+                Header="Название" 
+                Binding="{Binding Title}"/>
+            <DataGridTextColumn 
+                Header="Склад" 
+                Binding="{Binding Sklad.Adress}"/>
+            <DataGridTemplateColumn 
+                Header="Действия">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel 
+                            Orientation="Horizontal">
+                            <Button 
+                                Content="Удалить" 
+                                Name="DeleteButton" 
+                                Click="DeleteButton_Click"/>
+                            <Button 
+                                Content="Редактировать" 
+                                Name="EditButton" 
+                                Click="EditButton_Click"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>    
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+    ```
+    
+    И реализуем обработчики:
+
+    ```cs
+    private void DeleteButton_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SMDataGrid.SelectedItem as StroyMaterial;
+        Core.DB.StroyMaterial.Remove( item );
+        Core.DB.SaveChanges();
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SMDataGrid.SelectedItem as StroyMaterial;
+        // в классе StroyMaterialPage нет доступа к MainFrame, т.к. он находится в другом классе
+        // но т.к. StroyMaterialPage находится во Frame, то текущий Frame можно найти используя this.NavigationService
+        this.NavigationService.Navigate( new AddMaterial(item) );
+    }
+    ```
+
+#### Что делать если содержимое не вмещается на страницу?
+
+В этом случае содержимое нужно завернуть в эдемент **ScrollViewer**, при чем ему можно задать атрибут *VerticalScrollBarVisibility="Auto"*, чтобы полоса прокрутки показывалась только если содержимое действительно выходит за рамки страницы.
+
+Добавьте этот элемент на страницу **AddMaterial** и проверьте его работу.
+
+
+#### Работа с полями типа DateTime
+
+1. В SQL Management Studio добавьте в таблицу **StroyMaterial** поле *UpdateDate* с типом **date** (разрешить NULL тоже оставить, иначе поле не добавится):
+
+    ![](../img/task081.png)
+
+2. В Visual Studio открыть модель (двойной клик по модели в *обозревателе решений*)
+
+    ![](../img/task082.png)
+
+    И в контекстном меню *Обновить модель из базы данных*
+
+    ![](../img/task083.png)
+
+    ![](../img/task084.png)
+
+    После этого *сохраните всё* - студия задумается на некоторое время, обновляя классы.
+
+    Убеждаемся, что в классе **StroyMaterial** добавилось свойство *UpdateDate*, причем оно имеет нуллабельный тип
+
+    ![](../img/task085.png)
+
+3. В разметку страницы **AddMaterial** добавим элемент *DatePicker*, привязав его к нужному свойству текущего стройматериала:
+
+    ```xml
+    ...
+    </ComboBox>
+
+    <DatePicker 
+        SelectedDate="{Binding CurrentStroyMaterial.UpdateDate}"/>
+
+    <Button x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click"/>
+    ...
+    ```
+
+#### Фильтры и сортировка
+
+
+
 //TODO обновление списка при добавлении/удалении
 
-Задание:
-
-Создать окно с добавлением/удалением складов
 
 Таблица Customer (покупатель) с полями: id, Name, Surname, birthday (date), history? is_active (bool)
 
