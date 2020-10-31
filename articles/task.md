@@ -1770,7 +1770,7 @@ Core.DB.SaveChanges();
     ```xml
     <DataGrid 
         ItemsSource="{Binding MyStroyMaterials}" 
-        AutoGenerateColumns="False">
+        AutoGenerateColumns="False"><!-- запрет автоматической генерации -->
         <DataGrid.Columns>
             <DataGridTextColumn 
                 Header="Название" 
@@ -1896,6 +1896,151 @@ Core.DB.SaveChanges();
 
 #### Фильтры и сортировка
 
+1. Например, мы хотим найти все стройматериалы содного склада.
+
+    Реализуем это в коде (в скринкасте предлагается визуальную часть оставить на домашнее задание):
+
+    В разметке главного окна добавим кнопку *Тест*:
+
+    ```xml
+    <Button Content="Тест" Name="Test" Click="Test_Click"/>
+    ```
+
+    И реализуем обработчик *Test_Click*:
+
+    ```cs
+    private void Test_Click(object sender, RoutedEventArgs e)
+    {
+        var sklad = Core.DB.Sklad.FirstOrDefault();
+        if(sklad)
+            foreach (var sm in sklad.StroyMaterial) {
+                Console.WriteLine(sm.Title);
+            }
+    }
+    ```
+
+    Метод *FirstOrDefault* возвращает первуй элемент списка или null, если список пуст.
+
+    И, хотя в базе у нас связь от строй.материалов к складам, но Visual Studio при создании модели добавляет в склады виртуальное свойство ``public virtual ICollection<StroyMaterial> StroyMaterial { get; set; }``, которое служит для обратной связи "один ко многим". Пользуясь этим свойством мы выводим в консоль список строй.материалов первого попавшегося склада.
+
+2. Добавление фильтра и сортировки в список строй.материалов
+
+    Сначала "обернём" наш список в **StackPanel**
+
+    Затем добавим перед списком горизонтальный **StackPanel** с радиокнопками, которые будут менятьсортировку и текстовым полем, в котором будем писать фильтр (в нем сразу добавим событие *TextChanged*, которое будет срабатыватьпри изменении текста).
+
+    В итоге разметка будет примерно такой:
+
+    ```xml
+    <StackPanel Grid.Column="1" >
+
+        <StackPanel 
+            Orientation="Horizontal">
+            <RadioButton
+                Content="А-Я"/>
+            <RadioButton 
+                Content="Я-А"/>
+            <TextBox 
+                x:Name="SearchTextBox" 
+                Width="100"
+                TextChanged="SearchTextBox_TextChanged"/>
+        </StackPanel>
+
+        <ListView x:Name="MainListView" 
+                ItemsSource="{Binding MyElements}" 
+                MouseRightButtonUp="MainListView_MouseRightButtonUp" 
+                SelectionChanged="MainListView_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Label 
+                            Content="{Binding Title}"/>
+                        <Label 
+                            Content="{Binding Sklad.Adress}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackPanel>
+    ```
+
+    Теперь напишем код для сортировки и фильтрации:
+
+    Сначала можем просто убедиться, что обработчик работает как нам надо, выведя результат в консоль:
+
+    ```cs
+    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var searchText = SearchTextBox.Text;
+        Console.WriteLine(searchText);
+    }
+    ```
+
+    Теперь напишем более менее рабочий код:
+
+    ```cs
+    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var searchText = SearchTextBox.Text;
+        // при получении списка материалов добавляется метод Where, параметром которого является функция, возвращающая true или false 
+        MyElements = Core.DB.StroyMaterial.Where(filterByTitle).ToList();
+        MainListView.ItemsSource = MyElements;
+    }
+
+    // в параметрах у этой функции экземпляр строй.материала. т.е. метод Where перебирает все записи в таблице и возвращает только те, которые удовлетворяют условию
+    private bool filterByTitle(StroyMaterial sm) {
+        return (sm.Title == SearchTextBox.Text);
+    }
+    ```
+
+    Оптимизация кода:
+
+    1. Вместо отдельной функции можно использовать лямбда-функцию (мы про них говорили в прошлом году)
+
+        ```cs
+        MyElements = Core.DB.StroyMaterial.Where( sm => sm.Title == searchText ).ToList();
+        ```
+
+    2. Поиск по подстроке (точное совпадение меняем на метод Contains):
+
+        ```cs
+        MyElements = Core.DB.StroyMaterial.Where( sm => sm.Title.Contains(searchText) ).ToList();
+        ```
+
+        Если нам нужно искать строй.материалы название которых начинается с искомой строки, то нужно использовать метод **StartsWith** (т.е. тут можно использовать любую функцию работающую со строками и возвращающую true/false).
+
+    **Сортировка**
+
+    Добавим в радио кнопки обработчики выбора (одинаковый метод для обеих кнопок):
+
+    >Чтобы отличать кнопки друг от друга мы добавляем атрибут *Tag*
+
+    ```xml
+    <RadioButton
+        Checked="SortRadio_Checked"
+        Tag="0"
+        Content="А-Я"/>
+    <RadioButton 
+        Checked="SortRadio_Checked"
+        Tag="1"
+        Content="Я-А"/>
+    ```
+
+    и реализуем этот обработчик в коде, используя Tag как признак сортировки по возрастанию или убыванию:
+
+    >Тут надо обратить внимание, что атрибут Tag в отличии от большинства других языков имеет тип Object, поэтому его приходится приводить к строке.
+
+    ```cs
+    public void SortRadio_Checked(object sender, RoutedEventArgs e)
+    {
+        if((sender as RadioButton).Tag.ToString() == "1")
+            MyElements = Core.DB.StroyMaterial.OrderByDescending(sm => sm.Title).ToList();
+        else 
+            MyElements = Core.DB.StroyMaterial.OrderBy(sm => sm.Title).ToList();
+        MainListView.ItemsSource = MyElements;
+    }
+    ```
 
 
 //TODO обновление списка при добавлении/удалении
