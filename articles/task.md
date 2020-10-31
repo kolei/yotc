@@ -2087,12 +2087,65 @@ Core.DB.SaveChanges();
     ```
 5. Реализуем обработчик *TestButton_Click*
 
+    >Пока писал лекции, та ссылка на API, которая использовалась в скринкасте стала не валидной...
+
     ```cs
     private void TestButton_Click(object sender, RoutedEventArgs e)
     {
         var client = new WebClient();
-        ResultTextBlock.Text  = client.DownloadString("http://dev.hakta.pro/o/silkway/api/news/");
+        ResultTextBlock.Text  = client.DownloadString("https://ya.ru");
     }
+    ```
+
+    Если ответ сервера очень большой, то вспоминаем, что можно содержимое завернуть в **ScrollViewer**
+
+    ```xml
+    <ScrollViewer>
+        <StackPanel>
+            <Button Content="Test" Name="TestButton" Click="TestButton_Click"/>
+            <TextBlock x:Name="ResultTextBlock" TextWrapping="Wrap"/>
+        </StackPanel>
+    </ScrollViewer>
+    ```
+
+6. Работа с полученными данными
+
+    Данные мы получили как строку, работать со строкой напрямую можно (например, через regex), но не нужно. Для разбора строки есть десериализация. 
+    
+    Для начала мы должны определить класс, в который будут десериализованы полученные данные.
+
+    >В скринкасте был показан способ быстрого создания класса из текстового JSON: Edit -> Paste Special, но что-то в русском VS я такого не нашел...
+
+    В любом случае, мы должны создать два класса:
+
+    >Исходный объект выглядит так: ``{"data":["id":1]}``
+
+    ```cs
+    // ответ сервера содержит объект data, типа "массив"
+    [System.Runtime.Serialization.DataContract]
+    class ApiResponce
+    {
+        [DataMember]
+        public List<ApiItem> data { get; set; }
+    }
+
+    // каждый элемент массива содержит "целое" поле id
+    [System.Runtime.Serialization.DataContract]
+    class ApiItem
+    {
+        [DataMember]
+        public int id { get; set; }
+    }
+    ```
+
+    И переписываем *TestButton_Click* с учетом сериализации:
+
+    ```cs
+    // создаем экземпляр сериализатора, в параметрах передаем ему тип объекта, который будем сериализовать (класс, описанный выше)
+    var serializer = new DataContractJsonSerializer(typeof(ApiResponce));
+
+    // сериализуем полученный ответ сервера (я пока не нашел рабочего АПИ, тут просто вставил текстом)
+    var respObj = serializer.ReadObject( new MemoryStream(Encoding.UTF8.GetBytes(/*ResultTextBlock.Text*/"{\"data\":[{\"id\":1}]}")) );
     ```
 
 //TODO обновление списка при добавлении/удалении
