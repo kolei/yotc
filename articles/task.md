@@ -2047,9 +2047,53 @@ Core.DB.SaveChanges();
 
 #### Интернет
 
-**Host** - IP-адрес/название компьютера
+Напомнить про форматы JSON, XML, CSV
 
+Реализуем работу с каким-нибудь API:
+>//TODO пока взят "левый" из инета, в перспективе сделать свой, связанный со строй.материалами
 
+1. Создайте страницу (Page) APITestPage
+
+2. В разметке главного окна создайте кнопку
+
+    ```xml
+    <Button 
+        Content="API Тест" 
+        Name="ApiTestButton" 
+        Click="ApiTestButton_Click"/>
+    ```
+
+3. В обработчике этой кнопки показываем созданную страницу
+
+    ```cs
+    private void ApiTestButton_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate( new APITestPage() );
+    }
+    ```
+
+4. В странице **APITestPage** реализуем простенькую разметку - кнопка для запуска команды и текстовое поле, где будет отображаться результат:
+
+    ```xml
+    <StackPanel>
+        <Button 
+            Content="Test" 
+            Name="TestButton" 
+            Click="TestButton_Click"/>
+        <TextBlock 
+            x:Name="ResultTextBlock" 
+            TextWrapping="Wrap"/>
+    </StackPanel>
+    ```
+5. Реализуем обработчик *TestButton_Click*
+
+    ```cs
+    private void TestButton_Click(object sender, RoutedEventArgs e)
+    {
+        var client = new WebClient();
+        ResultTextBlock.Text  = client.DownloadString("http://dev.hakta.pro/o/silkway/api/news/");
+    }
+    ```
 
 //TODO обновление списка при добавлении/удалении
 
