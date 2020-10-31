@@ -30,7 +30,7 @@
     * [Расшифровка скринкаста ч.5](#Расшифровка-скринкаста-ч.5)
 * ~~Реализация отчетов~~
 * ~~Проектирование архитектуры~~
-* Тестирование
+* [Тестирование](#Тестирование)
 * ~~Разработка мобильного приложения~~
 * Документация
 * ~~Общий профессионализм решения~~
@@ -1915,7 +1915,7 @@ Core.DB.SaveChanges();
     private void Test_Click(object sender, RoutedEventArgs e)
     {
         var sklad = Core.DB.Sklad.FirstOrDefault();
-        if(sklad)
+        if(sklad != null)
             foreach (var sm in sklad.StroyMaterial) {
                 Console.WriteLine(sm.Title);
             }
@@ -2147,6 +2147,15 @@ Core.DB.SaveChanges();
     // сериализуем полученный ответ сервера (я пока не нашел рабочего АПИ, тут просто вставил текстом)
     var respObj = serializer.ReadObject( new MemoryStream(Encoding.UTF8.GetBytes(/*ResultTextBlock.Text*/"{\"data\":[{\"id\":1}]}")) );
     ```
+
+**Самостоятельная работа:**
+
+Получить данные с сервера, десериализовать и вывести списком в приложении.
+
+# Тестирование
+
+
+
 
 //TODO обновление списка при добавлении/удалении
 
