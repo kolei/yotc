@@ -2050,7 +2050,7 @@ Core.DB.SaveChanges();
 Напомнить про форматы JSON, XML, CSV
 
 Реализуем работу с каким-нибудь API:
->//TODO пока взят "левый" из инета, в перспективе сделать свой, связанный со строй.материалами
+>В рамках курса рассматривали АПИ нац.финала мобилки, но на момент написания этой лекции он уже не доступен. Сделал свой АПИ, который просто возвращает содержимое таблицы из указанной базы
 
 1. Создайте страницу (Page) APITestPage
 
@@ -2093,7 +2093,8 @@ Core.DB.SaveChanges();
     private void TestButton_Click(object sender, RoutedEventArgs e)
     {
         var client = new WebClient();
-        ResultTextBlock.Text  = client.DownloadString("https://ya.ru");
+        // вам в URL-е нужно прописать свои названия баз и таблиц
+        ResultTextBlock.Text  = client.DownloadString("http://kolei.ru/api/ekolesnikov/Sklad");
     }
     ```
 
@@ -2118,34 +2119,44 @@ Core.DB.SaveChanges();
 
     В любом случае, мы должны создать два класса:
 
-    >Исходный объект выглядит так: ``{"data":["id":1]}``
+    >Исходный объект выглядит так: ``{"data":[{запись из таблицы}], "success":true, "error":"опционально текст ошибки"}``
 
     ```cs
-    // ответ сервера содержит объект data, типа "массив"
+    // ответ сервера содержит объект data, типа "массив", success - признак успешного выполнения и error - текст ошибки
     [System.Runtime.Serialization.DataContract]
-    class ApiResponce
+    class ApiSklad
     {
         [DataMember]
-        public List<ApiItem> data { get; set; }
+        public List<ApiSkladItem> data { get; set; }
+        [DataMember]
+        public bool success { get; set; }
+        [DataMember]
+        public string error { get; set; }
     }
 
-    // каждый элемент массива содержит "целое" поле id
+    // каждый элемент массива Склад содержит поля
     [System.Runtime.Serialization.DataContract]
-    class ApiItem
+    class ApiSkladItem
     {
         [DataMember]
-        public int id { get; set; }
+        public int Num { get; set; }
+        [DataMember]
+        public string Adress { get; set; }
+        [DataMember]
+        public string Vid { get; set; }
+        [DataMember]
+        public int Rast { get; set; }
     }
     ```
 
-    И переписываем *TestButton_Click* с учетом сериализации:
+    И переписываем *TestButton_Click* с учетом десериализации:
 
     ```cs
     // создаем экземпляр сериализатора, в параметрах передаем ему тип объекта, который будем сериализовать (класс, описанный выше)
-    var serializer = new DataContractJsonSerializer(typeof(ApiResponce));
+    var serializer = new DataContractJsonSerializer(typeof(ApiSklad));
 
-    // сериализуем полученный ответ сервера (я пока не нашел рабочего АПИ, тут просто вставил текстом)
-    var respObj = serializer.ReadObject( new MemoryStream(Encoding.UTF8.GetBytes(/*ResultTextBlock.Text*/"{\"data\":[{\"id\":1}]}")) );
+    // сериализуем полученный ответ сервера
+    var respObj = serializer.ReadObject( new MemoryStream(Encoding.UTF8.GetBytes(ResultTextBlock.Text)) );
     ```
 
 **Самостоятельная работа:**
