@@ -155,10 +155,12 @@ a^2+b^2=c^2
 
 [KaTeX](https://github.com/KaTeX/KaTeX) является подмножеством [LaTeX](https://ru.wikipedia.org/wiki/LaTeX) и позволяет "рисовать" сложные формулы (но при этом уже страдает простота написания):
 
+```math
 % \f is defined as #1f(#2) using the macro
 \f\relax{x} = \int_{-\infty}^\infty
     \f\hat\xi\,e^{2 \pi i \xi x}
     \,d\xi
+```
 
 ### Mermaid
 
