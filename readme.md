@@ -6,3 +6,5 @@
 
 * "Учебник с примерами MySql, MS SQL Server and Oracle by examples (Svyatoslav Kulikov).pdf" (см. в каталоге **docs** этого репозитория) 
 
+* [Доклад про использование формата MarkDown и репозитория GitHub для хранения лекций и методических материалов](articles/doklad.md)
+
