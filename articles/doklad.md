@@ -135,32 +135,20 @@
 
 ## P.S.
 
-Для самого MarkDown тоже есть расширения. 
+Для самого MarkDown тоже есть расширения (но они уже поддерживаются не всеми репозиториями, например GitHub их не поддерживает, а GitLab поддерживает). 
 
 ### Math
 
-Позволяет рисовать простые формулы
+Позволяет рисовать формулы
 
 ```
 ```math
 a^2+b^2=c^2
 ```
 
-```math
+$$
 a^2+b^2=c^2
-```
-
-
-### KaTeX
-
-[KaTeX](https://github.com/KaTeX/KaTeX) является подмножеством [LaTeX](https://ru.wikipedia.org/wiki/LaTeX) и позволяет "рисовать" сложные формулы (но при этом уже страдает простота написания):
-
-```math
-% \f is defined as #1f(#2) using the macro
-\f\relax{x} = \int_{-\infty}^\infty
-    \f\hat\xi\,e^{2 \pi i \xi x}
-    \,d\xi
-```
+$$
 
 ### Mermaid
 
