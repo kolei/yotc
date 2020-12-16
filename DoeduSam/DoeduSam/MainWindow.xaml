@@ -13,6 +13,14 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
+        <StackPanel 
+            VerticalAlignment="Bottom" 
+            Orientation="Vertical">
+            <Button 
+                x:Name="CreateProductButton"
+                Click="CreateProductButton_Click"
+                Content="Добавить товар"/>
+        </StackPanel>
 
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -29,6 +37,7 @@
 
             <DataGrid 
                 Grid.Row="1" 
+                Name="MainDataGrid"
                 ItemsSource="{Binding MyProducts}"
                 AutoGenerateColumns="False">
 
@@ -52,13 +61,31 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn 
                     Header="Название"
-                    Binding="{Binding Name}"/>
+                    Binding="{Binding NameWithAdds}"/>
                     <DataGridTextColumn 
                     Header="Цена" 
                     Binding="{Binding Price}"/>
                     <DataGridTextColumn 
                     Header="Активен" 
-                    Binding="{Binding ActiveStr}"/>
+                    Binding="{Binding Active}"/>
+                    <DataGridTemplateColumn 
+                        Header="Действия">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel 
+                                    Orientation="Horizontal">
+                                    <Button 
+                                        Content="Удалить" 
+                                        Name="DeleteButton" 
+                                        Click="DeleteButton_Click"/>
+                                    <Button 
+                                        Content="Редактировать" 
+                                        Name="EditButton" 
+                                        Click="EditButton_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
 

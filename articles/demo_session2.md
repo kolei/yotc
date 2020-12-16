@@ -1,6 +1,6 @@
 # Сессия 2
 
-Рекомендации по Сессии 2, куски кода [смотри ниже](#Рекомендации-по-реализации)
+Рекомендации и куски кода [смотри ниже](#Рекомендации-по-реализации)
 
 ## Разработка
 
@@ -243,3 +243,232 @@ public partial class Products
 ```
 
 ![datagrid с нужными колонками и раскраской](../img/demo17.png)
+
+После этого я нарисовал "Представление" в БД и, соответственно, в программе считываю из базы не таблицу, а представление (естественно переделал модель и т.д.):
+
+```cs
+public List<vw_ProductDetails> MyProducts
+...
+MyProducts = Core.DB.vw_ProductDetails.ToList();
+```
+
+Ещё в модели представления создал вычисляемое свойство и отображаю его вместо названия продукта (по ТЗ мы должны в скобках показывать количество дополнительных товаров):
+
+```cs
+public string NameWithAdds
+{
+    get
+    {
+        return Name + " (" + ProductsCount.ToString() + ")";
+    }
+}
+```
+
+## Реализуем CRUD (Create Read Update Delete)
+
+### Добавление товаров (Create)
+
+Над таблицей товаров я оставил место для фильтра и сортировки, поэтому кнопку "добавить" расположим в левой колонке:
+
+```xml
+<StackPanel 
+    VerticalAlignment="Bottom" 
+    Orientation="Vertical">
+    <Button 
+        x:Name="CreateProductButton"
+        Click="CreateProductButton_Click"
+        Content="Добавить товар"/>
+</StackPanel>
+```
+
+Про навигатор со страницами мы пока вспоминать не будем, добавление/редактирование товара делаем в окне (как создавать окно вы уже знаете).
+
+```cs
+/// <summary>
+/// Обработчик клика по кнопке "Добавить товар". Открывает окно, при сохранении обновляет таблицу
+/// </summary>
+private void CreateProductButton_Click(object sender, RoutedEventArgs e)
+{
+    // в параметрах передаем новый товар (при редактировании будет существующий)
+    var NewProduct = new ProductWindow( new Products() );
+
+    /* 
+        тут новое для вас - метод ShowDialog может возвращать логическое значение 
+        (позже в коде окна увидим как его задать). 
+        При закрытии "крестиком" вернет false, а при нажатии "сохранить" - true. 
+        В прошлом проекте у нас не было обратной связи, а теперь после добавления товара мы будем перечитывать таблицу и обновлять визуальные компоненты
+    */
+    if ((bool)NewProduct.ShowDialog())
+    {
+        MyProducts = Core.DB.vw_ProductDetails.ToList();
+        UpdateValues();
+    }
+}
+
+/// <summary>
+/// Обновляет таблицу продуктов и счетчики записей
+/// </summary>
+private void UpdateValues() {
+    PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+    PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
+    PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+}
+```
+
+Про *PropertyChanged* я раньше рассказывал:
+
+```cs
+using System.ComponentModel;
+
+namespace DoeduSam
+{
+    public partial class MainWindow : Window, INotifyPropertyChanged
+                                              ^^^^^^^^^^^^^^^^^^^^^^
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        ...
+```
+
+**Окно редактирования товара**
+
+В разметке ничего нового, мы это проходили на стройматериалах. Не забывайте менять заголовок окна (я это сделал геттером).
+
+```xml
+    ...
+    Title="{Binding WindowTitle}" Height="450" Width="800">
+    <Grid>
+        <StackPanel>
+            <Label Content="Название товара"/>
+            <TextBox Text="{Binding CurrentProduct.Name}"/>
+            <Label Content="Название главного изображения"/>
+            <TextBox Text="{Binding CurrentProduct.Image}"/>
+            <Label Content="Производитель"/>
+            <ComboBox 
+                ItemsSource="{Binding ManufacturersList}"
+                SelectedItem="{Binding CurrentProduct.Manufacturers}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="Активен"/>
+            <TextBox Text="{Binding CurrentProduct.Active}"/>
+            <Label Content="Цена"/>
+            <TextBox Text="{Binding CurrentProduct.Price}"/>
+            <Button x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click"/>
+        </StackPanel>
+```
+
+В коде тоже все по-старому, добавилась только одна строчка в конце
+
+```cs
+public partial class ProductWindow : Window
+{
+    public Products CurrentProduct { get; set; }
+    public List<Manufacturers> ManufacturersList { get; set; }
+
+    // геттер для названия окна
+    public string WindowTitle {
+        get {
+            if (CurrentProduct.Id == 0) return "Добавление товара";
+            return "Редактирование товара";
+        }
+    }
+
+    public ProductWindow(Products Product)
+    {
+        InitializeComponent();
+        this.DataContext = this;
+        CurrentProduct = Product;
+        ManufacturersList = Core.DB.Manufacturers.ToList();
+    }
+
+    private void SaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        // добавляем только новые
+        if (CurrentProduct.Id == 0)
+            Core.DB.Products.Add(CurrentProduct);
+        // сохранение в БД
+        Core.DB.SaveChanges();
+
+        // эта команда как раз и задает результат диалога и автоматически закрывает его
+        DialogResult = true;
+    }
+}
+```
+
+### Чтение (Read) товаров вроде в ТЗ не прописано, достаточно общего списка.
+
+### Удаление (Delete) товара
+
+Кнопки для редактирования и удаления мы поместили в таблицу, но надо помнить, что при клике по этим кнопкам мы получаем экземпляр не **Products** а **vw_ProductDetails**. Поэтому перед редактированием и удалением нужно найти оригинальный **Product** по id (я обращал внимание при создании представления, что это поле нам понадобится, хотя оно и не указано в задании)
+
+```cs
+private void DeleteButton_Click(object sender, RoutedEventArgs e)
+{
+    var item = MainDataGrid.SelectedItem as vw_ProductDetails;
+
+    // ищем Products по id
+    var DeletedProduct = Core.DB.Products.Find(item.Id);
+
+    if (DeletedProduct != null)
+    try
+    {
+        // связи не дадут удалить товар, поэтому проверяем
+
+        // по ТЗ НУЖНО удалять товар с доп.товарами, насколько я помню это в связи задается - надо копнуть
+        if (DeletedProduct.AdditionalProducts.Count > 0) {
+            MessageBox.Show("Нельзя удалять товар, есть дополнительные товары");
+            return;
+        }
+
+        // с этим скорее всего тоже можно удалять
+        if (DeletedProduct.Images.Count > 0)
+        {
+            MessageBox.Show("Нельзя удалять товар, есть дополнительные изображения");
+            return;
+        }
+
+        // а вот эта проверка должна быть
+        if (DeletedProduct.ProductSales.Count > 0)
+        {
+            MessageBox.Show("Нельзя удалять товар, есть продажи");
+            return;
+        }
+
+        Core.DB.Products.Remove(DeletedProduct);
+        Core.DB.SaveChanges();
+
+        // и опять перечитываем представдение и обновляем визуальные компоненты
+        MyProducts = Core.DB.vw_ProductDetails.ToList();
+        UpdateValues();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Не смог удалить товар: "+ex.Message);
+        //throw;
+    }
+}
+```
+
+### Изменение (Update) товара
+
+При клике на кнопку редактирования тоже ищем оригинальный товар, в разметке и коде окна товара ничего не меняется
+
+```cs
+private void EditButton_Click(object sender, RoutedEventArgs e)
+{
+    var item = MainDataGrid.SelectedItem as vw_ProductDetails;
+    var EditProduct = Core.DB.Products.Find(item.Id);
+
+    if (EditProduct != null) {
+        var NewProduct = new ProductWindow( EditProduct );
+        if ((bool)NewProduct.ShowDialog())
+        {
+            MyProducts = Core.DB.vw_ProductDetails.ToList();
+            UpdateValues();
+        }
+    }
+}
+```

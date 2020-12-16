@@ -8,6 +8,6 @@ namespace DoeduSam
 {
     class Core
     {
-        public static kolei_ru DB = new kolei_ru();
+        public static DoeduSamEntities DB = new DoeduSamEntities();
     }
 }

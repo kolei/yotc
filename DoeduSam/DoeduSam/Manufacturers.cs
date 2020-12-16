@@ -12,29 +12,19 @@ namespace DoeduSam
     using System;
     using System.Collections.Generic;
     
-    public partial class Products
+    public partial class Manufacturers
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Products()
+        public Manufacturers()
         {
-            this.AdditionalProducts = new HashSet<AdditionalProducts>();
-            this.Images = new HashSet<Images>();
-            this.ProductSales = new HashSet<ProductSales>();
+            this.Products = new HashSet<Products>();
         }
     
-        public int Id { get; set; }
+        public int id { get; set; }
         public string Name { get; set; }
-        public string Image { get; set; }
-        public int ManufacturerId { get; set; }
-        public int Active { get; set; }
-        public int Price { get; set; }
-
+        public System.DateTime DateBeginWork { get; set; }
+    
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AdditionalProducts> AdditionalProducts { get; set; }
-        public virtual Manufacturers Manufacturers { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Images> Images { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ProductSales> ProductSales { get; set; }
+        public virtual ICollection<Products> Products { get; set; }
     }
 }

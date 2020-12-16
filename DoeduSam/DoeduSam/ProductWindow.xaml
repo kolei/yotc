@@ -1,0 +1,32 @@
+﻿<Window x:Class="DoeduSam.ProductWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DoeduSam"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}" Height="450" Width="800">
+    <Grid>
+        <StackPanel>
+            <Label Content="Название товара"/>
+            <TextBox Text="{Binding CurrentProduct.Name}"/>
+            <Label Content="Название главного изображения"/>
+            <TextBox Text="{Binding CurrentProduct.Image}"/>
+            <Label Content="Производитель"/>
+            <ComboBox 
+                ItemsSource="{Binding ManufacturersList}"
+                SelectedItem="{Binding CurrentProduct.Manufacturers}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="Активен"/>
+            <TextBox Text="{Binding CurrentProduct.Active}"/>
+            <Label Content="Цена"/>
+            <TextBox Text="{Binding CurrentProduct.Price}"/>
+            <Button x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

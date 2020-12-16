@@ -67,6 +67,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AdditionalProducts.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DoeduSamModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Images.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Manufacturers.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Products.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ProductSales.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ProductWindow.xaml.cs">
+      <DependentUpon>ProductWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="vw_ProductDetails.cs">
+      <DependentUpon>DoeduSamModel.tt</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -76,30 +102,26 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="DoeduSamModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DoeduSamModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DoeduSamModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DoeduSamModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ProductWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Products.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Products.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Products.cs">
-      <DependentUpon>Products.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Products.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Products.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Products1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Products.tt</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -117,14 +139,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EntityDeploy Include="Products.edmx">
+    <EntityDeploy Include="DoeduSamModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Products.Designer.cs</LastGenOutput>
+      <LastGenOutput>DoeduSamModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="packages.config" />
-    <None Include="Products.edmx.diagram">
-      <DependentUpon>Products.edmx</DependentUpon>
+    <None Include="DoeduSamModel.edmx.diagram">
+      <DependentUpon>DoeduSamModel.edmx</DependentUpon>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -137,19 +159,19 @@
     <Resource Include="service_logo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Products.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Products.Context.cs</LastGenOutput>
-      <DependentUpon>Products.edmx</DependentUpon>
-    </Content>
-    <Content Include="Products.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Products.edmx</DependentUpon>
-      <LastGenOutput>Products1.cs</LastGenOutput>
-    </Content>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Content Include="DoeduSamModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DoeduSamModel.edmx</DependentUpon>
+      <LastGenOutput>DoeduSamModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="DoeduSamModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DoeduSamModel.edmx</DependentUpon>
+      <LastGenOutput>DoeduSamModel.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
