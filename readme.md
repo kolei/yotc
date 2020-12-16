@@ -9,10 +9,10 @@
 
     Обычным текстом мои комментарии/реализация
 
-    * [Описание предметной области](../articles/demo_intro.md)
-    * [Сессия 1](../articles/demo_session1.md)
-    * [Сессия 2](../articles/demo_session2.md)
-    * [Сессия 3](../articles/demo_session3.md)
+    * [Описание предметной области](articles/demo_intro.md)
+    * [Сессия 1](articles/demo_session1.md)
+    * [Сессия 2](articles/demo_session2.md)
+    * [Сессия 3](articles/demo_session3.md)
 
 
 * [Старый вариант подготовки к демо-экзамену, я его больше править не буду, все новые замечания будут в "разборе полетов"](articles/task.md)
