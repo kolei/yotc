@@ -23,6 +23,16 @@ namespace DoeduSam
         }
     
         public int Id { get; set; }
+
+        public String ExistingProduct
+        {
+            get
+            {
+                if (Id == 0) return "Collapsed";
+                return "Visible";
+            }
+        }
+
         public string Name { get; set; }
         public string Image { get; set; }
         public int ManufacturerId { get; set; }

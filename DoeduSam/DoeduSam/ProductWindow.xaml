@@ -8,6 +8,10 @@
         Title="{Binding WindowTitle}" Height="450" Width="800">
     <Grid>
         <StackPanel>
+            <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentProduct.ExistingProduct}">
+                <Label Content="Идентификатор товара: "/>
+                <Label Content="{Binding CurrentProduct.Id}"/>
+            </StackPanel>
             <Label Content="Название товара"/>
             <TextBox Text="{Binding CurrentProduct.Name}"/>
             <Label Content="Название главного изображения"/>
