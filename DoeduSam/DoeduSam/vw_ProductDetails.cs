@@ -24,6 +24,7 @@ namespace DoeduSam
         public Nullable<int> VolumeLastSales { get; set; }
         public Nullable<int> AvgCountSaleInYear { get; set; }
         public string Active { get; set; }
+        public int ManufacturerId { get; set; }
 
         public string NameWithAdds
         {

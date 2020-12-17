@@ -29,6 +29,27 @@
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 
+
+            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <Label Content="Фильтр по производителям: "/>
+                <ComboBox
+                    Name="ManufacturersFilter"
+                    SelectedIndex="0"
+                    SelectionChanged="ComboBox_Selected"
+                    ItemsSource="{Binding ManufacturersList}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Label Content="Поиск по названию товара: "/>
+                <TextBox 
+                    x:Name="SearchTextBox" 
+                    MinWidth="100"
+                    KeyUp="SearchTextBox_KeyUp"/>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" Grid.Row="2">
                 <Label Content="{Binding FilteredProductsCount}"/>
                 <Label Content="/"/>
@@ -52,13 +73,13 @@
                 </DataGrid.RowStyle>
 
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="">
+                    <!-- DataGridTemplateColumn Header="">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Image Height="35" Width="35" Source="{Binding Image}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    </-->
                     <DataGridTextColumn 
                     Header="Название"
                     Binding="{Binding NameWithAdds}"/>

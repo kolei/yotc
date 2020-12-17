@@ -23,22 +23,12 @@ namespace DoeduSam
         }
     
         public int Id { get; set; }
-
-        public String ExistingProduct
-        {
-            get
-            {
-                if (Id == 0) return "Collapsed";
-                return "Visible";
-            }
-        }
-
         public string Name { get; set; }
         public string Image { get; set; }
         public int ManufacturerId { get; set; }
         public int Active { get; set; }
         public int Price { get; set; }
-
+    
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AdditionalProducts> AdditionalProducts { get; set; }
         public virtual Manufacturers Manufacturers { get; set; }

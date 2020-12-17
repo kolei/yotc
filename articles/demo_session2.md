@@ -19,10 +19,7 @@
 На странице со списком товаров необходимо добавить возможность поиска товаров по названию и описанию. Поиск должен работать в реальном времени (то есть без необходимости нажатия кнопки
 “найти”).
 >
->[//TODO]: фильтрация
->
->На странице со списком товаров необходимо добавить возможность фильтрации списка по производителю. Все производители из базы данных должны быть выведены в выпадающий список для
-фильтрации. Первым элементом в выпадающем списке должен быть “Все элементы”, при выборе которого настройки фильтра сбрасываются. Фильтрация должна работать в реальном времени (то есть без необходимости нажатия кнопки “найти”).
+>На странице со списком товаров необходимо добавить возможность фильтрации списка по производителю. Все производители из базы данных должны быть выведены в выпадающий список для фильтрации. Первым элементом в выпадающем списке должен быть “Все элементы”, при выборе которого настройки фильтра сбрасываются. Фильтрация должна работать в реальном времени (то есть без необходимости нажатия кнопки “найти”).
 >
 >Функции фильтрации и поиска должны применяться совместно к итоговой выборке.
 >
@@ -512,3 +509,164 @@ public String ExistingProduct
 }
 ```        
 
+## Реализуем фильтр по производителю
+
+>В первой сессии я дописал, что для фильтра нам нужен "Id" производителя в *представлении*
+
+Добавляем в главное окно список производителей:
+
+```cs
+// объявляем переменную
+private List<Manufacturers> _ManufacturersList;
+public List<Manufacturers> ManufacturersList { get; set; }
+
+...
+
+// в конструкторе считываем список и добавляем пункт "Все производители"
+
+ManufacturersList = Core.DB.Manufacturers.ToList();
+
+// у созданного элемента Id=0
+var newManufacturer = new Manufacturers();
+newManufacturer.Name = "Все производители";
+
+// вставляем в первую позицию списка
+ManufacturersList.Insert(0, newManufacturer);
+```
+
+И в разметке выпадающий список:
+
+```xml
+<StackPanel Orientation="Horizontal" Grid.Row="0">
+    <Label Content="Фильтр по производителям: "/>
+    <ComboBox
+        Name="ManufacturersFilter"
+        SelectedIndex="0"
+        SelectionChanged="ComboBox_Selected"
+        ItemsSource="{Binding ManufacturersList}">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <Label Content="{Binding Name}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+</StackPanel>
+```
+
+Аттрибут *SelectedIndex* нужен, чтобы сразу был выбран первый элемент списка.
+
+Реализуем обработчик *ComboBox_Selected*:
+
+```cs
+// объявляем переменную, которая будет хранить Id выбранного производителя
+private int _ManufacturerFilterId = 0;
+
+// в сеттере генерим события для изменения списка товаров и количества выбранных товаров
+public int ManufacturerFilterId
+{
+    get { return _ManufacturerFilterId; }
+    set {
+        _ManufacturerFilterId = value;
+        if (PropertyChanged != null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+            PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+        }
+    }
+}
+
+
+private void ComboBox_Selected(object sender, RoutedEventArgs e)
+{
+    // просто запоминаем Id выбранного производителя
+    ManufacturerFilterId = (ManufacturersFilter.SelectedItem as Manufacturers).id;
+}
+```
+
+Редактируем геттер свойства *MyProducts*
+
+```cs
+public List<vw_ProductDetails> MyProducts
+{
+    get
+    {
+        // метод FindAll возвращает элементы списка, удовлетворяющие условию
+        return _MyProducts.FindAll(item => (ManufacturerFilterId==0 || item.ManufacturerId==ManufacturerFilterId));
+    }
+    set
+    {
+        _MyProducts = value;
+    }
+}
+```
+
+И в геттере свойства *FilteredProductsCount* считаем количество не оригинального списка товаров, а отфильтрованного
+
+```cs
+public int FilteredProductsCount {
+    get
+    {
+        // показываю размер ФИЛЬТРОВАННОЙ таблицы
+        return MyProducts.Count;
+    }
+}
+```
+
+## Поиск по названию
+
+В вёрстку после комбобокса с производителями добавляем строку поиска
+
+```xml
+<Label Content="Поиск по названию товара: "/>
+<TextBox 
+    x:Name="SearchTextBox" 
+    MinWidth="100"
+    KeyUp="SearchTextBox_KeyUp"/>
+```
+
+В коде добавляем переменную для хранения строки поиска
+
+```cs
+private string _ProductNameFilter = "";
+public string ProductNameFilter
+{
+    get {
+        return _ProductNameFilter;
+    }
+    set
+    {
+        _ProductNameFilter = value;
+        if (PropertyChanged != null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+            PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+        }
+    }
+}
+```
+
+И добавляем поиск в фильтр товаров (тут из инета взята функция для 
+регистронезависимого поиска, но можно использовать *item.Name.Contains(ProductNameFilter)*,
+если трудно запомнить)
+
+```cs
+public List<vw_ProductDetails> MyProducts
+{
+    get
+    {
+        return _MyProducts.FindAll(item => 
+            (ManufacturerFilterId==0 || item.ManufacturerId==ManufacturerFilterId) && 
+            (ProductNameFilter=="" || item.Name.IndexOf(ProductNameFilter, StringComparison.OrdinalIgnoreCase)!=-1)
+        );
+    }
+    ...
+```
+
+Обработчик *SearchTextBox_KeyUp* совсем простой, вся магия в сеттерах
+
+```cs
+private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
+{
+    ProductNameFilter = SearchTextBox.Text;
+}
+```

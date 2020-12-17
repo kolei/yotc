@@ -24,25 +24,68 @@ namespace DoeduSam
 
         private List<vw_ProductDetails> _MyProducts;
 
+        private List<Manufacturers> _ManufacturersList;
+        public List<Manufacturers> ManufacturersList { get; set; }
+
+        private int _ManufacturerFilterId = 0;
+        public int ManufacturerFilterId
+        {
+            get { return _ManufacturerFilterId; }
+            set {
+                _ManufacturerFilterId = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+                }
+            }
+        }
+
+        private string _ProductNameFilter = "";
+        public string ProductNameFilter
+        {
+            get {
+                return _ProductNameFilter;
+            }
+            set
+            {
+                _ProductNameFilter = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public List<vw_ProductDetails> MyProducts
         {
             get
             {
-                return _MyProducts;
+                return _MyProducts.FindAll(item => 
+                    (ManufacturerFilterId==0 || item.ManufacturerId==ManufacturerFilterId) && 
+                    (ProductNameFilter=="" || item.Name.IndexOf(ProductNameFilter, StringComparison.OrdinalIgnoreCase)!=-1)
+                );
             }
             set
             {
                 _MyProducts = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+                }
             }
         }
 
         public int FilteredProductsCount {
             get
             {
-                // фильтра пока нет - показываю полный размер
-                return _MyProducts.Count;
+                // показываю размер ФИЛЬТРОВАННОЙ таблицы
+                return MyProducts.Count;
             }
         }
 
@@ -53,17 +96,18 @@ namespace DoeduSam
             }
         }
 
-        private void UpdateValues() {
-            PropertyChanged(this, new PropertyChangedEventArgs("MyProducts"));
-            PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
-            PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
-        }
-
         public MainWindow()
         {
             InitializeComponent();
 
             this.DataContext = this;
+
+            ManufacturersList = Core.DB.Manufacturers.ToList();
+
+            var newManufacturer = new Manufacturers();
+            newManufacturer.Name = "Все производители";
+
+            ManufacturersList.Insert(0, newManufacturer);
 
             MyProducts = Core.DB.vw_ProductDetails.ToList();
 
@@ -98,7 +142,6 @@ namespace DoeduSam
                 Core.DB.Products.Remove(DeletedProduct);
                 Core.DB.SaveChanges();
                 MyProducts = Core.DB.vw_ProductDetails.ToList();
-                UpdateValues();
             }
             catch (Exception ex)
             {
@@ -118,7 +161,6 @@ namespace DoeduSam
                 if ((bool)NewProduct.ShowDialog())
                 {
                     MyProducts = Core.DB.vw_ProductDetails.ToList();
-                    UpdateValues();
                 }
             }
         }
@@ -130,8 +172,17 @@ namespace DoeduSam
             if ((bool)NewProduct.ShowDialog())
             {
                 MyProducts = Core.DB.vw_ProductDetails.ToList();
-                UpdateValues();
             }
+        }
+
+        private void ComboBox_Selected(object sender, RoutedEventArgs e)
+        {
+            ManufacturerFilterId = (ManufacturersFilter.SelectedItem as Manufacturers).id;
+        }
+
+        private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            ProductNameFilter = SearchTextBox.Text;
         }
     }
 }

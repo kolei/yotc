@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Хранилище DoeduSamModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Хранилище DoeduSamModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AdditionalProducts">
           <Key>
             <PropertyRef Name="Id" />
@@ -62,6 +62,7 @@
             <PropertyRef Name="Price" />
             <PropertyRef Name="Manufacturer" />
             <PropertyRef Name="Active" />
+            <PropertyRef Name="ManufacturerId" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
@@ -73,9 +74,12 @@
           <Property Name="VolumeLastSales" Type="int" />
           <Property Name="AvgCountSaleInYear" Type="int" />
           <Property Name="Active" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="ManufacturerId" Type="int" Nullable="false" />
         </EntityType>
         <Association Name="FK_AdditionalProducts_Products">
-          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="Products" Type="Self.Products" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="AdditionalProducts" Type="Self.AdditionalProducts" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Products">
@@ -145,7 +149,8 @@
     [vw_ProductDetails].[DateLastSale] AS [DateLastSale], 
     [vw_ProductDetails].[VolumeLastSales] AS [VolumeLastSales], 
     [vw_ProductDetails].[AvgCountSaleInYear] AS [AvgCountSaleInYear], 
-    [vw_ProductDetails].[Active] AS [Active]
+    [vw_ProductDetails].[Active] AS [Active], 
+    [vw_ProductDetails].[ManufacturerId] AS [ManufacturerId]
     FROM [dbo].[vw_ProductDetails] AS [vw_ProductDetails]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK_AdditionalProducts_Products" Association="Self.FK_AdditionalProducts_Products">
@@ -165,8 +170,7 @@
             <End Role="ProductSales" EntitySet="ProductSales" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DoeduSamModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -231,6 +235,7 @@
             <PropertyRef Name="Price" />
             <PropertyRef Name="Manufacturer" />
             <PropertyRef Name="Active" />
+            <PropertyRef Name="ManufacturerId" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
@@ -242,6 +247,7 @@
           <Property Name="VolumeLastSales" Type="Int32" />
           <Property Name="AvgCountSaleInYear" Type="Int32" />
           <Property Name="Active" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ManufacturerId" Type="Int32" Nullable="false" />
         </EntityType>
         <Association Name="FK_AdditionalProducts_Products">
           <End Role="Products" Type="Self.Products" Multiplicity="1" />
@@ -373,6 +379,7 @@
           <EntitySetMapping Name="vw_ProductDetails">
             <EntityTypeMapping TypeName="DoeduSamModel.vw_ProductDetails">
               <MappingFragment StoreEntitySet="vw_ProductDetails">
+                <ScalarProperty Name="ManufacturerId" ColumnName="ManufacturerId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Price" ColumnName="Price" />
