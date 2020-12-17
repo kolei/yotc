@@ -13,7 +13,8 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel 
+        <StackPanel
+            Margin="10"
             VerticalAlignment="Bottom" 
             Orientation="Vertical">
             <Button 
@@ -22,7 +23,7 @@
                 Content="Добавить товар"/>
         </StackPanel>
 
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="1*"/>
@@ -58,6 +59,7 @@
 
             <DataGrid 
                 Grid.Row="1" 
+                CanUserAddRows="false"
                 Name="MainDataGrid"
                 ItemsSource="{Binding MyProducts}"
                 AutoGenerateColumns="False">
@@ -103,6 +105,10 @@
                                         Content="Редактировать" 
                                         Name="EditButton" 
                                         Click="EditButton_Click"/>
+                                    <Button 
+                                        Content="История" 
+                                        Name="HistoryButton" 
+                                        Click="HistoryButton_Click"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -75,6 +75,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DoeduSamModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="HistoryWindow.xaml.cs">
+      <DependentUpon>HistoryWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Images.cs">
       <DependentUpon>DoeduSamModel.tt</DependentUpon>
     </Compile>
@@ -93,6 +96,10 @@
     <Compile Include="vw_ProductDetails.cs">
       <DependentUpon>DoeduSamModel.tt</DependentUpon>
     </Compile>
+    <Page Include="HistoryWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +179,9 @@
       <DependentUpon>DoeduSamModel.edmx</DependentUpon>
       <LastGenOutput>DoeduSamModel.cs</LastGenOutput>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

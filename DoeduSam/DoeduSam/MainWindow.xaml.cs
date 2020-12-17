@@ -184,5 +184,13 @@ namespace DoeduSam
         {
             ProductNameFilter = SearchTextBox.Text;
         }
+
+        private void HistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = MainDataGrid.SelectedItem as vw_ProductDetails;
+            var HistoryProduct = Core.DB.Products.Find(item.Id);
+            var NewHistoryWindow = new HistoryWindow(HistoryProduct);
+            NewHistoryWindow.ShowDialog();
+        }
     }
 }

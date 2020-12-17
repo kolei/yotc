@@ -1,0 +1,44 @@
+﻿<Window x:Class="DoeduSam.HistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DoeduSam"
+        mc:Ignorable="d"
+        Title="История продаж" Height="442" Width="569">
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="5">
+            <ComboBox
+                Name="ProductsComboBox"
+                SelectionChanged="ProductsComboBox_SelectionChanged"
+                SelectedIndex="{Binding SelectedProductIndex}"
+                ItemsSource="{Binding ProductsList}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Цена товара: "/>
+                <Label Content="{Binding SelectedProduct.Price}"/>
+            </StackPanel>
+
+            <DataGrid 
+                Name="HistoryDataGrid"
+                CanUserAddRows="False"
+                ItemsSource="{Binding HistoryList}"
+                AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn 
+                    Header="Дата продажи"
+                    Binding="{Binding DateSale}"/>
+                <DataGridTextColumn 
+                    Header="Количество"
+                    Binding="{Binding Kolichestvo}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        </StackPanel>
+    </Grid>
+</Window>

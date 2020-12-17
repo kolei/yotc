@@ -73,8 +73,6 @@
 
 ### История продаж товаров
 
->[//TODO]: история_продаж
->
 >В окне списка товаров необходимо предусмотреть возможность перейти на окно для получения списка всех продаж этого товара.
 На данном окне должна быть возможность посмотреть информацию о конкретном товаре, дате и времени продажи, а также количестве проданного товара.
 >
@@ -644,8 +642,7 @@ public string ProductNameFilter
 ```
 
 И добавляем поиск в фильтр товаров (тут из инета взята функция для 
-регистронезависимого поиска, но можно использовать *item.Name.Contains(ProductNameFilter)*,
-если трудно запомнить)
+регистронезависимого поиска, но можно использовать *item.Name.Contains(ProductNameFilter)*, если трудно запомнить)
 
 ```cs
 public List<vw_ProductDetails> MyProducts
@@ -671,13 +668,11 @@ private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
 
 ## Проверка на отрицательную сумму
 
-Это элементарно, надеюсь сами сделаете - в методе сохранения 
-тупо проверить значение и выдать предупреждение.
+Это элементарно, надеюсь сами сделаете - в методе сохранения тупо проверить значение и выдать предупреждение.
 
 ## Дополнительные товары
 
-По визуальной части тамничего нового - окно редактирования товара делите на две части и в 
-правой показываете список дополнительных товаров DataGridom с фильтром по
+По визуальной части там ничего нового - окно редактирования товара делите на две части и в правой показываете список дополнительных товаров DataGridom с фильтром по
 Id основного товара. Для добавления показываете ещё одно окно с полным списком 
 (можно автоматически вырезать текущий товар).
 
@@ -685,7 +680,142 @@ Id основного товара. Для добавления показыва
 
 Остается вопрос как их выбрать...
 
+>Заметил, что в *DataGrid*-e внизу отображается пустая строка. Можно данные вносить сразу в неё, но у нас такого в задании нет, поэтому отключаем эту фичу добавляя аттрибут `CanUserAddRows="false"`
+
 ## История продаж
 
-Тут совсем просто (надо только вспомнить как выбрать не все товары, а с фильтром)
+В список товаров добавляем кнопку "история". 
 
+```xml
+<Button 
+    Content="История" 
+    Name="HistoryButton" 
+    Click="HistoryButton_Click"/>
+```
+
+Обработчик кнопки
+
+```cs
+private void HistoryButton_Click(object sender, RoutedEventArgs e)
+{
+    // тут у меня опять лишние телодвижения с представлением
+    var item = MainDataGrid.SelectedItem as vw_ProductDetails;
+    var HistoryProduct = Core.DB.Products.Find(item.Id);
+
+    // главное что мы получили экземпляр товара и передали его во вновь созданное окно "история"
+    var NewHistoryWindow = new HistoryWindow(HistoryProduct);
+    NewHistoryWindow.ShowDialog();
+}
+```
+
+Полная разметка окна "история"
+
+```xml
+    ...
+    Title="История продаж" Height="442" Width="569">
+<Grid>
+    <StackPanel 
+        Orientation="Vertical" 
+        Margin="5">
+
+        <!-- список товаров, по ТЗ мы должны обеспечить в этом окне выбор товара -->
+        <ComboBox
+            Name="ProductsComboBox"
+            SelectionChanged="ProductsComboBox_SelectionChanged"
+            SelectedIndex="{Binding SelectedProductIndex}"
+            ItemsSource="{Binding ProductsList}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding Name}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <!-- опять же по ТЗ мы должны показать информацию о товаре, но не написано какую - я показываю цену -->
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Цена товара: "/>
+            <Label Content="{Binding SelectedProduct.Price}"/>
+        </StackPanel>
+
+        <!-- список истории продаж -->
+        <DataGrid 
+            Name="HistoryDataGrid"
+            CanUserAddRows="False"
+            ItemsSource="{Binding HistoryList}"
+            AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn 
+                    Header="Дата продажи"
+                    Binding="{Binding DateSale}"/>
+                <DataGridTextColumn 
+                    Header="Количество"
+                    Binding="{Binding Kolichestvo}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </StackPanel>
+</Grid>
+```
+
+Код окна "история продаж"
+
+```cs
+// не забываем про INotifyPropertyChanged
+public partial class HistoryWindow : Window, INotifyPropertyChanged
+{
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    // список для "истории продаж" с фильтром по выбранному товару и сортировкой по дате (по убыванию)
+    private List<ProductSales> _HistoryList;
+    public List<ProductSales> HistoryList { 
+        get {
+            return _HistoryList.
+                FindAll(history => history.ProductId == SelectedProduct.Id).
+                OrderByDescending(f => f.DateSale).
+                ToList();
+        }
+        set {
+            _HistoryList = value;
+        }
+    }
+
+    // список товаров, по нему фильтров нет
+    public List<Products> ProductsList { get; set; }
+
+    // индекс (позиция в списке) продукта с которого начинается просмотр (сам продукт передается в конструкторе)
+    public int SelectedProductIndex { get; set; }
+
+    // сеттер для выбранного товара - перерисовываем интерфейс
+    private Products _SelectedProduct;
+    public Products SelectedProduct {
+        get {
+            return _SelectedProduct;
+        }
+        set {
+            _SelectedProduct = value;
+            if (PropertyChanged != null) { 
+                PropertyChanged(this, new PropertyChangedEventArgs("HistoryList"));
+                PropertyChanged(this, new PropertyChangedEventArgs("SelectedProduct"));
+            }
+        }
+    }
+
+    public HistoryWindow(Products Product)
+    {
+        InitializeComponent();
+        DataContext = this;
+
+        SelectedProduct = Product;
+
+        HistoryList = Core.DB.ProductSales.ToList();
+        ProductsList = Core.DB.Products.ToList();
+
+        // ищем индекс в списке товаров
+        SelectedProductIndex = ProductsList.FindIndex(product => product.Id == SelectedProduct.Id);
+    }
+
+    private void ProductsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        SelectedProduct = ProductsComboBox.SelectedItem as Products;
+    }
+}
+```

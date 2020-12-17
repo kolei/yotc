@@ -144,7 +144,63 @@ public class Analytics
 
 Собственно уже эта реализация дает почти целый балл в оценке (хотя она ничего и не делает, просто возвращает то что пришло обратно)
 
->Нормальную реализацию этого метода я попробую расписать позже, если хватит времени, пока займемся тестированием
+Полная реализация
+
+```cs
+namespace CompanyCoreLib
+{
+    // вспомогательный класс, который поможет отсортировать даты по частоте использования
+    class DateTimeWithCounter
+    {
+        public DateTime DateTimeProp;
+        public int Counter = 0;
+
+        // конструктор
+        public DateTimeWithCounter(DateTime date) {
+            DateTimeProp = date;
+            Counter = 1;
+        }
+    }
+
+    public class Analytics
+    {
+        public List<DateTime> PopularMonths(List<DateTime> dates)
+        {
+            // объавляем временный массив объектов "ДатаСоСчетчиком"
+            var DateTimeWithCounterList = new List<DateTimeWithCounter>();
+
+            // тут сразу можно сделать проверку на длину исходного массива
+
+            // перебираем исходный массив
+            foreach (DateTime date in dates) {
+                // вычисляем начало месяца для текущей даты
+                var DateMonthStart = new DateTime(date.Year, date.Month, 1, 0, 0, 0);
+
+                // ищем эту дату во вспомогательном массиве    
+                var index = DateTimeWithCounterList.
+                    FindIndex(item => item.DateTimeProp == DateMonthStart);
+
+                if (index == -1)
+                {
+                    // такой даты нет - добавляю
+                    DateTimeWithCounterList.
+                        Add(new DateTimeWithCounter(DateMonthStart));
+                }
+                else {
+                    // дата есть - увеличиваем счетчик
+                    DateTimeWithCounterList[index].Counter++;
+                }
+            }
+
+            // вспомогательный массив сортируем по убыванию по счетчику (самые популярные попадают в начало списка) и выбираем из объекта только дату, счетчик нам уже не нужен
+            return DateTimeWithCounterList.
+                OrderByDescending(item => item.Counter).
+                Select(item => item.DateTimeProp).
+                ToList();
+        }
+    }
+}
+```
 
 ## Разработка модульных тестов
 
@@ -178,7 +234,41 @@ public class Analytics
 
 ### Написание тестов
 
-Тут смотрите лекцию по тестированию, ничего нового не скажу
+Пока не совсем тест, а просто проверка работы класса аналитики
+
+```cs
+namespace CompanyCoreLib.Tests
+{
+    [TestClass]
+    public class AnalyticsTest
+    {
+        static Analytics AnalyticsClass = null;
+
+        [ClassInitialize]
+        static public void Init(TestContext tc)
+        {
+            AnalyticsClass = new Analytics();
+        }
+
+
+        [TestMethod]
+        public void TestMethod1()
+        {
+            // формирую набор тестовых данных
+            var dates = new List<DateTime>() { 
+                new DateTime(2020, 12, 17), 
+                new DateTime(2020, 11, 17), 
+                new DateTime(2020, 12, 1) };
+
+            // выполняю метод PopularMonths
+            dates = AnalyticsClass.PopularMonths(dates);
+
+            // тут должна быть проверка, я пока просто в отладчике посмотрел, что возвращает как надо
+        }
+    }
+}
+```
+
 
 ## Разработка тестовых сценариев
 

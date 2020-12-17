@@ -21,6 +21,7 @@ namespace DoeduSam
     {
         public Products CurrentProduct { get; set; }
         public List<Manufacturers> ManufacturersList { get; set; }
+        public List<AdditionalProducts> AdditionalProductsList { get; set; }
         public string WindowTitle {
             get {
                 if (CurrentProduct.Id == 0) return "Добавлние товара";
@@ -35,6 +36,10 @@ namespace DoeduSam
             
             CurrentProduct = Product;
             ManufacturersList = Core.DB.Manufacturers.ToList();
+            /*
+            AdditionalProductsList = Core.DB.AdditionalProducts.
+                Where(add_product => add_product.ProductId == Product.Id).
+                SelectMany()*/
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -46,5 +51,6 @@ namespace DoeduSam
             Core.DB.SaveChanges();
             DialogResult = true;
         }
+
     }
 }
