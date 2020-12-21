@@ -13,6 +13,7 @@
     * [Сессия 1](articles/demo_session1.md)
     * [Сессия 2](articles/demo_session2.md)
     * [Сессия 3](articles/demo_session3.md)
+    * [Замечания](articles/demo_comments.md)
 
 
 * [Старый вариант подготовки к демо-экзамену, я его больше править не буду, все новые замечания будут в "разборе полетов"](articles/task.md)
