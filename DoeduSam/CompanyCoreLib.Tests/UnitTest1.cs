@@ -19,7 +19,12 @@ namespace CompanyCoreLib.Tests
         [TestMethod]
         public void TestMethod1()
         {
-            List<DateTime> dates = new List<DateTime>() { new DateTime(2020, 12, 17), new DateTime(2020, 11, 17), new DateTime(2020, 12, 1) };
+            List<DateTime> dates = new List<DateTime>() { 
+                new DateTime(2020, 12, 17),
+                new DateTime(2020, 12, 15),
+                new DateTime(2020, 11, 17),
+                new DateTime(2020, 11, 15),
+                new DateTime(2020, 10, 1) };
 
             dates = AnalyticsClass.PopularMonths(dates);
         }

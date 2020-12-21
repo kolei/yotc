@@ -192,11 +192,16 @@ namespace CompanyCoreLib
                 }
             }
 
-            // вспомогательный массив сортируем по убыванию по счетчику (самые популярные попадают в начало списка) и выбираем из объекта только дату, счетчик нам уже не нужен
-            return DateTimeWithCounterList.
-                OrderByDescending(item => item.Counter).
-                Select(item => item.DateTimeProp).
-                ToList();
+            // вспомогательный массив сортируем по убыванию по счетчику (самые популярные попадают в начало списка) 
+            // ЗАТЕМ сортируем ПО дате по возрастанию
+            // выбираем из объекта только дату, счетчик нам уже не нужен
+            return DateTimeWithCounterList
+                .OrderByDescending(item => item.Counter)
+                // при первом прочтении это условие не разглядел
+                .ThenBy(item => item.DateTimeProp)
+                .Select(item => item.DateTimeProp)
+                .ToList();
+
         }
     }
 }

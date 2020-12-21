@@ -40,10 +40,11 @@ namespace CompanyCoreLib
                 }
             }
 
-            return DateTimeWithCounterList.
-                OrderByDescending(item => item.Counter).
-                Select(item => item.DateTimeProp).
-                ToList();
+            return DateTimeWithCounterList
+                .OrderByDescending(item => item.Counter)
+                .ThenBy(item => item.DateTimeProp)
+                .Select(item => item.DateTimeProp)
+                .ToList();
         }
     }
 }
