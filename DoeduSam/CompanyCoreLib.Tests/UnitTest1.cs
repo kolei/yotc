@@ -17,9 +17,29 @@ namespace CompanyCoreLib.Tests
 
 
         [TestMethod]
-        public void TestMethod1()
+        public void PopularMonths_ValidData()
         {
             List<DateTime> dates = new List<DateTime>() { 
+                new DateTime(2020, 11, 17),
+                new DateTime(2020, 12, 17),
+                new DateTime(2020, 10, 1) };
+
+            dates = AnalyticsClass.PopularMonths(dates);
+
+            // должно вернуть все 3 записи
+            Assert.AreEqual(dates.Count, 3);
+
+            Assert.AreEqual(dates[0], new DateTime(2020, 10, 1));
+
+            //Assert.AreEqual(dates[0].Year, 2020);
+            //Assert.AreEqual(dates[0].Month, 10);
+            //Assert.AreEqual(dates[0].Day, 1);
+        }
+
+        [TestMethod]
+        public void PopularMonths_ValidDataWithAdditionalSortByDate()
+        {
+            List<DateTime> dates = new List<DateTime>() {
                 new DateTime(2020, 12, 17),
                 new DateTime(2020, 12, 15),
                 new DateTime(2020, 11, 17),
@@ -27,6 +47,13 @@ namespace CompanyCoreLib.Tests
                 new DateTime(2020, 10, 1) };
 
             dates = AnalyticsClass.PopularMonths(dates);
+
+            // тоже должно вернуть 3 записи
+            Assert.AreEqual(dates.Count, 3);
+
+            // но первая ноябрь
+            Assert.AreEqual(dates[0], new DateTime(2020, 11, 1));
         }
+
     }
 }
