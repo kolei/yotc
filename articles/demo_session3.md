@@ -133,7 +133,7 @@ namespace CompanyCoreLib
 public class Analytics
 {
     public List<DateTime> PopularMonths(List<DateTime> dates) {
-        return list;
+        return dates;
     }
 }
 ```
@@ -304,6 +304,7 @@ namespace CompanyCoreLib.Tests
 Рабочая версия | 1.0 | Эту версию не плохо бы вписать в свойства проекта
 Имя тестирующего | DEMO_xx | 
 Дата(ы) теста | 21.12.2020 | текущая
+
 
 ### Тестовый пример #1:
 
