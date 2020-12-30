@@ -211,6 +211,10 @@
     (затронуто строк: 100)
     ```
 
+## Завершение загрузки
+
+***УДАЛЯЕМ*** временные таблицы (*client_a_import*, *service_a_import*, *serviceclient_a_import*). Если этого не сделать, то могут насчитать штрафных баллов за не нормализованную БД.
+
 <table><tr>
 <td><a href="../articles/demo_restore_from_sql.md"> Восстановление БД</a></td>
 <td><a href="../articles/demo_toc.md">Содержание</a></td>

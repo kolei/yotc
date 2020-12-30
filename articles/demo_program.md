@@ -1,8 +1,10 @@
 # Программирование
 
-* [Создание приложения](#Создание-приложения)
-* [Стили, иконки, логотипы](#Стили-иконки-логотипы)
-* Список услуг/товаров
++ [Создание приложения](#Создание-приложения)
++ [Стили, иконки, логотипы](#Стили-иконки-логотипы)
++ [Создание модели даных](#Создание-модели-даных)
+* [Список услуг/товаров](#Список-услуг/товаров)
+    + [Отображение списка услуг в табличном виде](#Отображение-списка-услуг-в-табличном-виде)
     - Режим администратора
     - Макет "плиткой"
     - Изображения
@@ -61,6 +63,21 @@
 
 ![](../img/demo59.png)
 
+В конструкторе сразу задем *DataContext*
+
+```cs
+this.DataContext = this;
+```
+
+И реализуем обработчик для кнопки *Выход*:
+
+```cs
+private void ExitButton_Click(object sender, RoutedEventArgs e)
+{
+    Application.Current.Shutdown();
+}
+```
+
 ## Стили, иконка, логотип
 
 ### Фирменный стиль (цвет и шрифт)
@@ -74,11 +91,6 @@
 ```xml
 <Application.Resources>
     <Application.Resources>
-        <!-- этот стиль применим ко всем элементам окна -->
-        <Style x:Key="DefaultStyle" TargetType="Control">
-            <Setter Property="FontFamily" Value="Arial Black" />
-        </Style>
-
         <Style TargetType="Button">
             <Setter Property="Background" Value="#ff9c1a"/>
         </Style>
@@ -96,17 +108,17 @@
 
 Таким образом мы можем менять любое свойство элементов.
 
-Для того, чтобы стиль *DefaultStyle* подействовал на все элементы окна, его нужно задать окну:
+Для того, чтобы какой-то стиль подействовал на все элементы окна, его нужно задать окну. Например, зададим шрифт:
 
 ```xml
 ...
-Style="{StaticResource DefaultStyle}"
+FontFamily="Arial Black"
 Title="Услуги авто сервиса" 
 MinHeight="100" MinWidth="300"
 Height="450" Width="800">
 ```
 
-Обратите внимание, для кнопки мы задавали только фон, шрифт подтянулся из стилей окна:
+Обратите внимание, для кнопки мы задавали только фон, шрифт наследуется от окна:
 
 ![](../img/demo60.png)
 
@@ -123,8 +135,11 @@ Height="450" Width="800">
 и назначить этот стиль нужным элементам:
 
 ```xml
-<Button Name="ExitButton" Content="Exit" Click="ExitButton_Click"
-                Style="{StaticResource BrownButtonStyle}"/>
+<Button 
+    Name="ExitButton" 
+    Content="Exit" 
+    Click="ExitButton_Click"
+    Style="{StaticResource BrownButtonStyle}"/>
 ```
 
 Обратите внимание, мы указываем не просто название стиля, а выражение в фигурных скобках. Фигурные скобки означают, что внутри не фиксированное значение, а вычисляемое. В нашем случае указание получить статичный ресурс с указанным названием.
@@ -189,3 +204,282 @@ Height="450" Width="800">
 Теперь кнопки на логотип не наезжают (но кнопок еще добавится в процессе разработки, поэтому вариант не окончательный)
 
 ![](../img/demo62.png)
+
+## Создание модели даных
+
+В **C#** для работы с БД используется ORM **Entity**. Т.е. нам в коде не нужно писать запросы к базе, а просто оперировать объектами, которые сгенерирует для нас **Entity**
+
+>ORM (Object-Relational Mapping) – технология программирования, которая связывает базы данных с концепциями объектно-ориентированных языков программирования, создавая «виртуальную объектную базу данных»
+
+Сначала в *Management Studio* запоминаем как называется наш сервер:
+
+В контекстном меню **сервера** выбираем *свойства* 
+
+![имя сервера](../img/task057.png)
+
+и запоминаем **имя** сервера (у вас на демо-экзамене будет другой)
+
+![](../img/task058.png)
+
+### Подключаем БД
+
+1. В контекстном меню проекта выбираем пункты *Добавить -> Создать элемент*
+
+    ![](../img/task028.png)
+
+2. Выбираем в разделе *Данные* элемент *Модель ADO.NET EDM*, не забывая отредактировать *имя* модели:
+
+    ![](../img/task029.png)
+
+    ![](../img/task030.png)
+
+    Далее выбираем источником данных *Microsoft SQL Server*
+
+    ![](../img/task059.png)
+
+3. В мастере моделей *создаем соединение*
+
+    ![](../img/task031.png)
+
+    **Имя сервера** вставляем то, которое запомнили в Management Studio 
+
+    **Проверка подлинности** *SQL Server*
+
+    Имя и пароль вам выдавали в начале курса.
+
+    **Проверяем подключение**, если все нормально, то выбираем свою базу данных (должна быть та же что и логин).
+
+    ![](../img/task032.png)
+
+    Ставим галочку "Да, включить конфиденциальные данные в строку подключения".
+
+4. После выбора подключения мастер спросит какие объекты базы данных нам нужны, выбираем все таблицы:
+
+    ![](../img/demo63.png)
+
+5. При формировании модели система может выдать предупреждения, что скрипт может быть потенциально вредоносным - соглашаемся.
+
+После формирования модели отобразится диаграмма и создадутся файлы модели:
+
+![](../img/demo64.png)
+
+![](../img/demo65.png)
+
+>Если в процессе разработки вы что-то измените в структуре БД, то заново модель создавать не нужно, а просто в модели кликнуть правой кнопкой мыши и *Обновить модель из базы данных*
+
+
+## Список услуг/товаров
+
+Перед выводом данных нужно получить сам объект вывода (в нашем случае это список услуг). Чтобы не создавать каждый раз новое подключение к БД создадим класс **Core**, который будет содержать статический метод получения экземпляра БД. Т.е. реализуем шаблон "Одиночка". Помимо того, что это экономит ресурсы приложения и сервера, это позволяет модели отслеживать изменения отдельных сущностей (таблиц).
+
+Добавим в приложение класс:
+
+Помня, что нужно соблюдать логическую структуру проекта, создадим папку *classes* в проекте и добавим в неё класс (контекстное меню каталога -> Добавить -> Класс)
+
+![](../img/task077.png)
+
+Пусть класс назвается **Core**:
+
+![](../img/task078.png)
+
+и в нем объявим статическую переменную
+
+```cs
+class Core
+{
+    // demoEntities это название подключения, которое вы дали при создании модели
+    public static demoEntities DB = new demoEntities();
+}
+```
+
+В классе объявляем приватное свойство для хранения списка услуг *_ServiceList* и публичное свойство *ServiceList* для доступа к этому списку:
+
+```cs
+private List<Service> _ServiceList;
+public List<Service> ServiceList {
+    get { return _ServiceList;  }
+    set { _ServiceList = value; }
+}
+```
+
+В конструкторе главного окна получаем список услуг (т.к. мы поместили класс в отдельный каталог, то нужно включить его *namespace* в зависимости `using AutoService.classes;`):
+
+```cs
+ServiceList = Core.DB.Service.ToList();
+```
+
+### Отображение списка услуг в табличном виде
+
+В разметку добавляем компонент **DataGrid** (во вторую колонку)
+
+```xml
+<DataGrid 
+    Grid.Column="1"
+    ItemsSource="{Binding ServiceList}"/>
+```
+
+Если все сделано правильно, то при запуске приложения будет выведено содержимое таблицы:
+
+![](../img/demo66.png)
+
+Видим, что информация выводится не в том виде, который нам нужен. 
+
+1. Отключаем автоматическую генерацию колонок и запрещаем пользователю добавлять строки
+
+    ```xml
+    <DataGrid 
+        Grid.Column="1"
+        ItemsSource="{Binding ServiceList}"
+        CanUserAddRows="false"
+        AutoGenerateColumns="False"/>
+    ```
+
+2. Добавляем в **DataGrid** описание для нужных колонок (*У каждой  услуги должны отображаться следующие данные: наименование услуги,  стоимость, продолжительность, миниатюра главного изображения, размер скидки*)
+
+Каталог с картинками должен лежать там же где **EXE**-файл. Скорее всего это подкаталог `bin\Debug`.
+
+```xml
+<DataGrid 
+    Grid.Column="1"
+    CanUserAddRows="false"
+    AutoGenerateColumns="False"
+    ItemsSource="{Binding ServiceList}">
+
+    <DataGrid.Columns>
+        <!-- колонкам я задаю фиксированную ширину, чтобы они не ёрзали при прокрутке -->
+        <DataGridTextColumn
+            Width="250"
+            Header="Наименование услуги"
+            Binding="{Binding Title}"/>
+        <DataGridTextColumn 
+            Width="100"
+            Header="Стоимость"
+            Binding="{Binding Cost}"/>
+        <DataGridTextColumn 
+            Width="150"
+            Header="Продолжительность"
+            Binding="{Binding DurationInSeconds}"/>
+        <DataGridTemplateColumn 
+            Width="64"
+            Header="">
+            <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                    <!-- для отображения изображения использую геттер, который определен в МОДЕЛИ Service -->
+                    <Image 
+                        Height="64" 
+                        Width="64" 
+                        Source="{Binding ImageUri}" />
+                </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTextColumn 
+            Width="60"
+            Header="Скидка"
+            Binding="{Binding Discount}"/>
+    </DataGrid.Columns>
+</DataGrid>
+```
+
+Геттер для картинки:
+
+```cs
+// Service.cs
+public Uri ImageUri {
+    get { 
+        return new Uri(Path.Combine(Environment.CurrentDirectory, MainImagePath));
+    }
+}
+```
+
+**URI (Uniform Resource Identifiers)**. URI нужны, чтобы идентифицировать и запросить новый вид ресурса. Используя URI, можно обращаться не только к Web-страницам, но и к FTP-серверу, Web-сервису и **локальным файлам**.
+
+**Path.Combine** - метод, который склеивает текущий каталог (*Environment.CurrentDirectory*) и путь к картинками
+
+В текущей разметке мне не нравится, что у цены 4 знака после запятой. К тому же читая задание дальше видим, что нужно рядом вывести цену со скидкой. Завернем оба эти параметра в геттеры:
+
+```cs
+// Service.cs
+public string CostString
+{
+    get
+    {
+        // тут должно быть понятно - преобразование в строку с нужной точностью
+        return Cost.ToString("#.##");
+    }
+}
+
+public string CostWithDiscount
+{
+    get
+    {
+        // Convert.ToDecimal - преобразует double в decimal
+        // Discount ?? 0 - разнуливает "Nullable" переменную
+        return (Cost * Convert.ToDecimal(1 - Discount ?? 0)).ToString("#.##");
+    }
+}
+
+// ну и сразу пишем геттер на наличие скидки
+public Boolean HasDiscount
+{
+    get
+    {
+        return Discount > 0;
+    }
+}
+
+// и перечёркивание старой цены
+public string CostTextDecoration
+{
+    get
+    {
+        return HasDiscount ? "None" : "Strikethrough";
+    }
+}
+```
+
+Для раскраски строк *DataGrid*-а используем стиль с триггером. Т.е. стиль применяется только к тем строкам, в которых выполняется условие `HasDiscount = True`
+
+```xml
+...
+ItemsSource="{Binding ServiceList}">
+
+<DataGrid.RowStyle>
+    <Style TargetType="DataGridRow">
+        <Style.Triggers>
+            <DataTrigger 
+                Binding="{Binding HasDiscount}" 
+                Value="True">
+                <Setter 
+                    Property="Background" 
+                    Value="LightGreen"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</DataGrid.RowStyle>
+
+<DataGrid.Columns>
+...
+```
+
+Обычная *DataGridTextColumn* не поддерживает перечеркивания, приходится заворачивать как картинку в шаблон:
+
+```xml
+<DataGridTemplateColumn 
+    Width="100"
+    Header="Стоимость">
+
+    <DataGridTemplateColumn.CellTemplate>
+        <DataTemplate>
+            <!-- TextBlock поддерживает перечеркивание -->
+            <TextBlock 
+                TextDecorations="{Binding CostTextDecoration}"
+                Text="{Binding CostString}"/>
+        </DataTemplate>
+    </DataGridTemplateColumn.CellTemplate>
+</DataGridTemplateColumn>
+```
+
+Вроде про отображение списка услуг все расказал (админка, фильтрация и сортировка будут дальше). На текущий момент приложение должно выглядеть примерно так:
+
+![](../img/demo67.png)

@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoService"
         mc:Ignorable="d"
-        Style="{StaticResource DefaultStyle}"
+        FontFamily="Arial Black"
         Title="Услуги авто сервиса" 
         MinHeight="300" MinWidth="300"
-        Height="450" Width="800">
+        Height="450" Width="960">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -30,5 +30,67 @@
                 Content="Выход"
                 Click="ExitButton_Click"/>
         </StackPanel>
+
+        <DataGrid 
+            Grid.Column="1"
+            CanUserAddRows="false"
+            AutoGenerateColumns="False"
+            ItemsSource="{Binding ServiceList}">
+
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasDiscount}" Value="True">
+                            <Setter Property="Background" Value="LightGreen"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Width="250"
+                    Header="Наименование услуги"
+                    Binding="{Binding Title}"/>
+                <DataGridTemplateColumn 
+                    Width="100"
+                    Header="Стоимость">
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock 
+                                TextDecorations="{Binding CostTextDecoration}"
+                                Text="{Binding CostString}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTextColumn 
+                    Width="170"
+                    Header="Стоимость со скидкой"
+                    Binding="{Binding CostWithDiscount}"/>
+                <DataGridTextColumn 
+                    Width="150"
+                    Header="Продолжительность"
+                    Binding="{Binding DurationInSeconds}"/>
+                <DataGridTemplateColumn 
+                    Width="64"
+                    Header="">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image 
+                                Height="64" 
+                                Width="64" 
+                                Source="{Binding ImageUri}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn 
+                    Width="60"
+                    Header="Скидка"
+                    Binding="{Binding Discount}"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
