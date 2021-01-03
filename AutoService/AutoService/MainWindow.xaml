@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoService"
         mc:Ignorable="d"
+        x:Name="Root"
         FontFamily="Arial Black"
         Title="Услуги авто сервиса" 
         MinHeight="300" MinWidth="300"
-        Height="450" Width="960">
+        Height="450" Width="1080">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -24,7 +25,15 @@
             Orientation="Vertical"
             Margin="5"
             VerticalAlignment="Bottom">
-             <Button 
+            <Button
+                Content="Добавить услугу"
+                Visibility="{Binding AdminVisibility}"
+                Click="Button_Click"/>
+            <Button
+                Content="{Binding AdminModeCaption}"
+                Name="AdminButton"
+                Click="AdminButton_Click"/>
+            <Button 
                 Style="{StaticResource BrownButtonStyle}"
                 x:Name="ExitButton"
                 Content="Выход"
@@ -90,6 +99,27 @@
                     Width="60"
                     Header="Скидка"
                     Binding="{Binding Discount}"/>
+
+                <DataGridTemplateColumn
+                    Header="Действия">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel 
+                                Visibility="{Binding DataContext.AdminVisibility, ElementName=Root}"
+                                Orientation="Horizontal">
+                                <Button 
+                                        Content="Редактировать" 
+                                        Name="EditButton" 
+                                        Click="EditButton_Click"/>
+                                <Button 
+                                        Content="Удалить" 
+                                        Name="DeleteButton" 
+                                        Click="DeleteButton_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

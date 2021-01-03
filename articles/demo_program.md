@@ -4,10 +4,12 @@
 + [Стили, иконки, логотипы](#Стили-иконки-логотипы)
 + [Создание модели даных](#Создание-модели-даных)
 * [Список услуг/товаров](#Список-услуг/товаров)
-    + [Отображение списка услуг в табличном виде](#Отображение-списка-услуг-в-табличном-виде)
-    - Режим администратора
-    - Макет "плиткой"
-    - Изображения
+    + [Отображение списка услуг в табличном виде с выводом миниатюр (изображений)](#Отображение-списка-услуг-в-табличном-виде)
+    + [Режим администратора](#Режим-администратора)
+        + модальное окно (создание, возвращаемый результат)
+        + обратная связь с окном (INotifyPropertyChanged)
+        + условное отображение кнопок в панели и в *DataGrid*-е
+    - ~~Макет "плиткой"~~
     - Сортировка (своя)
     - Фильтры
     - Поиск (по нескольким полям)
@@ -483,3 +485,239 @@ ItemsSource="{Binding ServiceList}">
 Вроде про отображение списка услуг все расказал (админка, фильтрация и сортировка будут дальше). На текущий момент приложение должно выглядеть примерно так:
 
 ![](../img/demo67.png)
+
+## Режим администратора
+
+>В данной подсистеме необходимо добавить режим администратора. Для активации данного режима необходимо ввести код (на этапе разработки код всегда будет одинаковый = 0000). Список услуг должен быть виден всем в клиентской зоне (обычный режим), а функции добавления, удаления, редактирования данных об услуге, а также запись клиента на услугу и просмотр ближайших записей должен быть доступен только администратору (режим администратора).
+
+1. Создание окна для ввода пароля *InputBoxWindow*:
+
+    Окно буду делать универсальным - название окна буду передавать в конструкторе.
+
+    * Создаем отдельный каталог для окон и добавляем **namespace** в зависимости:
+
+        ```cs
+        using AutoService.windows;
+        ```
+
+    * В каталоге проекта *windows* создаем новое окно (*контекстное меню -> добавить -> Окно WPF*) *InputBoxWindow*
+
+    * Разметка окна *InputBoxWindow* примерно такая:
+
+        ```xml
+            MinHeight="110" MinWidth="530"
+            Title="{Binding WindowCaption}" Height="110" Width="530">
+        <Grid>
+            <StackPanel 
+                Orientation="Vertical">
+                <TextBox 
+                    x:Name="TextBox" 
+                    Margin="10" 
+                    Text="{Binding InputText}"/>
+                <StackPanel 
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+                    <Button 
+                        x:Name="OkButton"
+                        Content="Ok"
+                        Margin="5"
+                        Click="OkButton_Click"/>
+                    <Button
+                        x:Name="CancelButton"
+                        Content="Cancel"
+                        Margin="5"
+                        Click="CancelButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        ```
+
+        - заголовок окна (*Title*) будет задаваться в конструкторе
+        - не забываем про минимальные размеры окна
+        - вводимый текст привязываем к свойству (*{Binding InputText}*)
+
+        Остальное должно быть понятно без комментариев.
+
+    * Код окна *InputBoxWindow*:
+
+        ```cs
+        // в классе объявляем свойства для заголовка окна и введенного текста
+        public string WindowCaption { get; set; }
+        public string InputText { get; set; }
+        ```
+
+        ```cs
+        public InputBoxWindow(string Caption)
+        {
+            InitializeComponent();
+            // заголовок окна берем из параметров конструктора
+            WindowCaption = Caption;
+            this.DataContext = this;
+        }
+        ```
+
+        ```cs
+        // в обработчиках кнопок "Ok" и "Cancel" задаем результат модального окна
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
+        ```
+
+2. Изменения в главном окне (*MainWindow*):
+
+    * в левую панель добавим кнопку для входа в режим администратора (я добавил еще и выход, но это вроде как не обязательно)
+
+        ```xml
+        <Button
+            Content="{Binding AdminModeCaption}"
+            Name="AdminButton"
+            Click="AdminButton_Click"/>
+        ```
+
+        У меня текст кнопки будет меняться в зависимости от текущего режима, поэтому он сделан привязкой к свойству класса окна. 
+
+    * добавляем необходимые свойства в код:
+
+        ```cs
+        private Boolean _IsAdminMode = false;
+        // публичный геттер, который меняет текущий режим (Админ/не Админ)
+        public Boolean IsAdminMode
+        {
+            get { return _IsAdminMode; }
+            set
+            {
+                _IsAdminMode = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("AdminModeCaption"));
+                }
+            }
+        }
+        // этот геттер возвращает текст для кнопки в зависимости от текущего режима
+        public string AdminModeCaption {
+            get {
+                if (IsAdminMode) return "Выйти из режима\nАдминистратора";
+                return "Войти в режим\nАдминистратора";
+            }
+        }
+        ```   
+
+        Тут появляется новая *фича* C# - обратная связь с окном (*PropertyChanged*). Дело в том, что окно прорисовывается один раз при создании и дальше существует само по себе. Содержимое свойств класса автоматически не отслеживается.
+
+        Чтобы дать знать визуальной части что какое-то свойство изменилось (и, соответсвенно, перерисовать его) используется интерфейс *INotifyPropertyChanged*.
+
+        Для того, чтобы окно реализовывало этот интерфейс нужно добавить его в описание класса:
+
+        ```cs
+        public partial class MainWindow : Window, INotifyPropertyChanged
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^     
+        ```
+
+
+        Интерфейс *INotifyPropertyChanged* определен в пространстве имен *System.ComponentModel*, если оно еще не подключено, то добавьте в заголовке using System.ComponentModel (можно это сделать выбрав нужное действие в выпадающем списке возможных решений, как это сделано ниже)
+
+        После добавления интерфейса IDE нас предупредит, что для этого интерфеса нет реализации - добавляем:
+
+        ![](../img/task026.gif)
+
+        в классе у нас появится событие *PropertyChanged*, которое мы и вызываем, когда хотим перерисовать какой-то визуальный элемент
+    
+        ```cs
+        public event PropertyChangedEventHandler PropertyChanged;
+        ```
+
+        В нашем случае мы сообщаем окну, что изменилось свойство *AdminModeCaption* (проверка `PropertyChanged != null` нужна, т.к. на момент создания окна это свойство еще не создано):
+
+        ```cs
+        if (PropertyChanged != null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs("AdminModeCaption"));
+        }
+        ```
+
+    * и в обработчике клика кнопки *AdminButton* реализуем логику переключения режима:
+
+        ```cs
+        private void AdminButton_Click(object sender, RoutedEventArgs e)
+        {
+            // если мы уже в режиме Администратора, то выходим из него 
+            if (IsAdminMode) IsAdminMode = false;
+            else {
+                // создаем окно для ввода пароля
+                var InputBox = new InputBoxWindow("Введите пароль Администратора");
+                // и показываем его как диалог (модально)
+                if ((bool)InputBox.ShowDialog())
+                {
+                    // если нажали кнопку "Ok", то включаем режим, если пароль введен верно
+                    IsAdminMode = InputBox.InputText == "0000";
+                }
+            }
+        }
+        ```
+3. Добавление кнопок для режима Администратора
+
+    * в классе главного окна создаем геттер *AdminVisibility*, чтобы отображать нужные кнопки только в режиме Администратора:
+
+        ```cs
+        public string AdminVisibility {
+            get {
+                if (IsAdminMode) return "Visible";
+                return "Collapsed";
+            }
+        }
+        ```
+
+    * в сеттер свойства *IsAdminMode* добавим вызов уведомления:
+
+        ```cs
+        PropertyChanged(this, new PropertyChangedEventArgs("AdminVisibility"));
+        ```
+
+    * окну даем название `x:Name="Root"` (в разметке, там же где задаем Title)
+
+    * кнопки редактирования/удаления записи добавляем прямо в *DataGrid*:
+
+        ```xml
+        <DataGridTemplateColumn
+            Header="Действия">
+            <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                    <StackPanel 
+                        Visibility="{Binding DataContext.AdminVisibility, ElementName=Root}"
+                        Orientation="Horizontal">
+                        <Button 
+                                Content="Редактировать" 
+                                Name="EditButton" 
+                                Click="EditButton_Click"/>
+                        <Button 
+                                Content="Удалить" 
+                                Name="DeleteButton" 
+                                Click="DeleteButton_Click"/>
+                    </StackPanel>
+                </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        ```
+
+        Обратите внимание:
+            - кнопки "завернуты" в элемент *StackPanel* т.к. у *DataTemplate* может быть только один потомок
+            - *StackPanel* виден только если включен режим администратора (запоминать значения свойства "Visibility" не обязательно, их подскажет Intellisence при вводе);
+            - привязка (*Binding*) производится не напрямую к свойству *AdminVisibility*, а через свойство *DataContext* окна. Дело в том, что текущим контекстом в DataGridTemplate будет экземпляр класса **Service**.
+    
+    * и в боковую панель добавляем кнопку "Добавить услугу" (кнопки "Запись на услугу" и "просмотр записей" сделаете позже, если успеете):
+
+        ```xml
+        <Button
+            Content="Добавить услугу"
+            Visibility="{Binding AdminVisibility}"
+            Click="Button_Click"/>
+        ```
+        
+Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.
+
