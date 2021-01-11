@@ -1,3 +1,11 @@
+<table><tr>
+<td></td>
+<td><a href="../articles/demo_toc.md">Содержание</a></td>
+<td><a href="../articles/demo_restore_from_sql.md">Восстановление БД из SQL-скрипта</a></td>
+<tr></table>
+
+НЕ ЗАКОНЧЕНО
+
 # Основы SQL
 
 SQL или Structured Query Language (язык структурированных запросов) — язык программирования, предназначенный для управления данными в СУБД. Все современные СУБД поддерживают SQL.
@@ -301,3 +309,10 @@ FROM Employees
 WHERE Birthday BETWEEN '19800101' AND '19891231' -- сотрудники 80-х годов
 ORDER BY Birthday
 ```
+
+
+<table><tr>
+<td></td>
+<td><a href="../articles/demo_toc.md">Содержание</a></td>
+<td><a href="../articles/demo_restore_from_sql.md">Восстановление БД из SQL-скрипта</a></td>
+<tr></table>

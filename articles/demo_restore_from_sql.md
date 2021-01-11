@@ -1,5 +1,5 @@
 <table><tr>
-<td></td>
+<td><a href="../articles/demo_sql.md">Основы SQL</a></td>
 <td><a href="../articles/demo_toc.md">Содержание</a></td>
 <td><a href="../articles/demo_import.md">Импорт данных</a></td>
 <tr></table>
