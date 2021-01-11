@@ -3,7 +3,7 @@
 * ~~Диаграммы (UseCase, Sequence...)~~, к Пинешкину
 * ~~ERD~~, к Ахматову
 * MSSQL
-    - Основы SQL
+    - [Основы SQL](../articles/demo_sql.md)
     + [Восстановление БД из SQL-скрипта](../articles/demo_restore_from_sql.md)
     + [Импорт данных](../articles/demo_import.md)
     - Нормализация БД
