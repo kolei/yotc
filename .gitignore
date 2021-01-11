@@ -1,7 +1,13 @@
 doklad.pdf
+
 DoeduSam/.vs
 DoeduSam/DoeduSam/bin
 DoeduSam/DoeduSam/obj
 DoeduSam/packages
 DoeduSam/CompanyCoreLib*/bin
 DoeduSam/CompanyCoreLib*/obj
+
+AutoService/.vs
+AutoService/AutoService/bin
+AutoService/AutoService/obj
+AutoService/packages
