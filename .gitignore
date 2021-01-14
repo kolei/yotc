@@ -8,6 +8,11 @@ DoeduSam/CompanyCoreLib*/bin
 DoeduSam/CompanyCoreLib*/obj
 
 AutoService/.vs
-AutoService/AutoService/bin
 AutoService/AutoService/obj
 AutoService/packages
+
+# исключение для картинок
+AutoService/AutoService/bin/*
+!AutoService/AutoService/bin/Debug
+AutoService/AutoService/bin/Debug/*
+!AutoService/AutoService/bin/Debug/Услуги автосервиса/
