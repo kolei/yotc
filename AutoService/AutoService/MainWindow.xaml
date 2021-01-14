@@ -40,11 +40,36 @@
                 Click="ExitButton_Click"/>
         </StackPanel>
 
-        <DataGrid 
-            Grid.Column="1"
-            CanUserAddRows="false"
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding ServiceList}">
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Content="Цена: "/>
+                <RadioButton 
+                    GroupName="Price"
+                    Tag="1"
+                    Content="по возрастанию" 
+                    IsChecked="True" 
+                    Checked="RadioButton_Checked"
+                    VerticalContentAlignment="Center"/>
+                <RadioButton 
+                    GroupName="Price" 
+                    Tag="2"
+                    Content="по убыванию" 
+                    Checked="RadioButton_Checked"
+                    VerticalContentAlignment="Center"/>
+            </StackPanel>
+            
+            <DataGrid 
+                Grid.Row="1"
+                CanUserAddRows="false"
+                CanUserSortColumns="False"
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding ServiceList}">
 
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
@@ -73,7 +98,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTextColumn 
                     Width="170"
                     Header="Стоимость со скидкой"
@@ -122,5 +147,6 @@
 
             </DataGrid.Columns>
         </DataGrid>
+        </Grid>
     </Grid>
 </Window>

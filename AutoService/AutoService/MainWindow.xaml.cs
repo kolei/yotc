@@ -25,12 +25,29 @@ namespace AutoService
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private List<Service> _ServiceList;
-        public List<Service> ServiceList {
-            get { return _ServiceList;  }
-            set { _ServiceList = value; }
+        private Boolean _SortPriceAscending = true;
+        public Boolean SortPriceAscending {
+            get { return _SortPriceAscending;  }
+            set
+            {
+                _SortPriceAscending = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+                }
+            }
         }
 
+        private List<Service> _ServiceList;
+        public List<Service> ServiceList {
+            get { 
+                if (SortPriceAscending)
+                    return _ServiceList.OrderBy(item => Double.Parse(item.CostWithDiscount)).ToList();
+                else
+                    return _ServiceList.OrderByDescending(item => Double.Parse(item.CostWithDiscount)).ToList();
+            }
+            set { _ServiceList = value; }
+        }
 
         private Boolean _IsAdminMode = false;
         public Boolean IsAdminMode
@@ -99,6 +116,11 @@ namespace AutoService
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SortPriceAscending = ((sender as RadioButton).Tag.ToString() == "1");
         }
     }
 }

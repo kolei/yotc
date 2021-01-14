@@ -10,7 +10,7 @@
         + обратная связь с окном (INotifyPropertyChanged)
         + условное отображение кнопок в панели и в *DataGrid*-е
     - ~~Макет "плиткой"~~
-    - Сортировка (своя)
+    - [Сортировка](#Сортировка)
     - Фильтры
     - Поиск (по нескольким полям)
     - Количество отображаемых/всего записей
@@ -484,7 +484,7 @@ ItemsSource="{Binding ServiceList}">
 
 ![](../img/demo67.png)
 
-## Режим администратора
+### Режим администратора
 
 >В данной подсистеме необходимо добавить режим администратора. Для активации данного режима необходимо ввести код (на этапе разработки код всегда будет одинаковый = 0000). Список услуг должен быть виден всем в клиентской зоне (обычный режим), а функции добавления, удаления, редактирования данных об услуге, а также запись клиента на услугу и просмотр ближайших записей должен быть доступен только администратору (режим администратора).
 
@@ -716,6 +716,122 @@ ItemsSource="{Binding ServiceList}">
             Visibility="{Binding AdminVisibility}"
             Click="Button_Click"/>
         ```
-        
+
+На текущий момент приложение должно выглядеть примерно так:
+
+![](/img/demo68.png)
+
+Т.е. после входа в режим администратора должны быть видны кнопки "Добавить услугу" в левой панели и "Редактировать", "Удалить" в таблице услуг.
+
+---
+
+### Сортировка
+
+>Реализуйте возможность сортировки списка услуг по их стоимости (по возрастанию и по убыванию). Сортировка  должна  быть  реализована  отдельно  (не  с  помощью стандартных  функций  элементов управления), потому что в дальнейшем планируется усложнение этого функционала путем добавления дополнительных условий.
+
+Мы, в качестве усложнения функционала, будем сортировать по "цене со скидкой".
+
+Для начала над таблицей услуг выделим область для элементов. Пока нам нужны радиокнопки для переключения режима сортировки, в перспективе там добавятся выпадающий список и текстовое поле для фильтрации.
+
+В разметке главного окна добавляем вложенный **Grid**, который разделим на три строки:
+
+```xml
+<!-- выводим во вторую колонку основного Grid-a -->
+<Grid Grid.Column="1">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="30"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="30"/>
+    </Grid.RowDefinitions>
+
+    <!-- сюда перенести DataGrid и сразу запретить автоматическую сортировку -->
+    <DataGrid 
+        Grid.Row="1"
+        CanUserSortColumns="False"
+        ...
+</Grid>    
+```
+
+В первой строке, как я уже говорил, будут элементы управления. Во вторую перезжает DataGrid. И в третей будет количество записей в БД (позже).
+
+Радиокнопки заворачиваем в StackPanel:
+
+```xml
+<StackPanel 
+    Orientation="Horizontal" 
+    VerticalAlignment="Center">
+    <Label Content="Цена: "/>
+    <RadioButton 
+        GroupName="Price"
+        Tag="1"
+        Content="по возрастанию" 
+        IsChecked="True" 
+        Checked="RadioButton_Checked"
+        VerticalContentAlignment="Center"/>
+    <RadioButton 
+        GroupName="Price" 
+        Tag="2"
+        Content="по убыванию" 
+        Checked="RadioButton_Checked"
+        VerticalContentAlignment="Center"/>
+</StackPanel>
+```
+
+Аттрибуты элемента *RadioButton*:
+
+**GroupName** - позволяет группировать несколько радиокнопок в одну группу. Т.е. выбор только одного варианта.
+
+**Tag** - по этому полю мы будем определять какой вариант выбран.
+
+**IsChecked** - эта радиокнопка будет выбрана по-умолчанию.
+
+В классе объявляем переменную, отвечающую за режим сортировки и геттер, сеттер для неё:
+
+```cs
+private Boolean _SortPriceAscending = true;
+public Boolean SortPriceAscending {
+    get { return _SortPriceAscending;  }
+    set
+    {
+        _SortPriceAscending = value;
+        if (PropertyChanged != null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+        }
+    }
+}
+```
+
+Реализуем обработчик *RadioButton_Checked*:
+
+```cs
+private void RadioButton_Checked(object sender, RoutedEventArgs e)
+{
+    SortPriceAscending = (sender as RadioButton).Tag.ToString() == "1";
+}
+```
+
+Осталось сделать сортировку списка в геттере в зависимости от режима сортировки:
+
+```cs
+public List<Service> ServiceList {
+    get { 
+        if (SortPriceAscending)
+            return _ServiceList
+                .OrderBy(item => Double.Parse(item.CostWithDiscount))
+                .ToList();
+        else
+            return _ServiceList
+                .OrderByDescending(item => Double.Parse(item.CostWithDiscount))
+                .ToList();
+    }
+    set { _ServiceList = value; }
+}
+```
+
+В лекциях по тестированию я уже рассказывал про **LINQ**. Здесь используется эта же технология. В зависимости от выбранного режима список сортируется по полю *CostWithDiscount* (само поле текстовое, поэтому при сортировке приходится преобразовывать его в число)
+
+---
+
 Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.
 
