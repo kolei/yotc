@@ -92,11 +92,9 @@ private void ExitButton_Click(object sender, RoutedEventArgs e)
 
 ```xml
 <Application.Resources>
-    <Application.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#ff9c1a"/>
-        </Style>
-    </Application.Resources>
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="#ff9c1a"/>
+    </Style>
 </Application.Resources>
 ```
 
