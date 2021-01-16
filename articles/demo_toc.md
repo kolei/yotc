@@ -1,6 +1,28 @@
-# Методические рекомендации по подготовке к демо-экзамену.
+<table style="width: 100%;">
+  <tr>
+    <td style="text-align: center; border: none;">
+    Министерство...</td>
+  </tr>
+  <tr>
+    <td style="text-align: center; border: none; height: 15em;"><h2>Методические рекомендации по подготовке к демо-экзамену.</h2></td>
+  </tr>
+  <tr>
+    <td style="text-align: right; border: none; height: 20em;">
+      Разработал:<br/>
+      Колесников Евгений Иванович
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center; border: none; height: 5em;">
+    г.Йошкар-Ола, 2021</td>
+  </tr>
+</table>
+
+<div style="page-break-after: always;"></div>
 
 >Рекомендации написаны для задания из каталога `docs/demo1.9` этого репозитория.
+
+# Содержание
 
 * ~~Диаграммы (UseCase, Sequence...)~~, к Пинешкину
 * ~~ERD~~, к Ахматову
