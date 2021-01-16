@@ -25,6 +25,38 @@ namespace AutoService
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private List<Tuple<string, float, float>> FilterByDiscountValuesList = new List<Tuple<string, float, float>>() {
+            Tuple.Create("Все записи", 0f, 1f),
+            Tuple.Create("от 0% до 5%", 0f, 0.05f),
+            Tuple.Create("от 5% до 15%", 0.05f, 0.15f),
+            Tuple.Create("от 15% до 30%", 0.15f, 0.3f),
+            Tuple.Create("от 30% до 70%", 0.3f, 0.7f),
+            Tuple.Create("от 70% до 100%", 0.7f, 1f)
+        };
+
+        public List<string> FilterByDiscountNamesList {
+            get {
+                return FilterByDiscountValuesList.Select(item => item.Item1).ToList();
+            }
+        }
+
+        private Tuple<float, float> _CurrentDiscountFilter = Tuple.Create(float.MinValue, float.MaxValue);
+
+        public Tuple<float, float> CurrentDiscountFilter { 
+            get
+            {
+                return _CurrentDiscountFilter;
+            }
+            set
+            {
+                _CurrentDiscountFilter = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+                }
+            }
+        }
+
         private Boolean _SortPriceAscending = true;
         public Boolean SortPriceAscending {
             get { return _SortPriceAscending;  }
@@ -40,11 +72,15 @@ namespace AutoService
 
         private List<Service> _ServiceList;
         public List<Service> ServiceList {
-            get { 
+            get {
+                var FilteredServiceList = _ServiceList.FindAll(item =>
+                    item.DiscountFloat >= CurrentDiscountFilter.Item1 &&
+                    item.DiscountFloat < CurrentDiscountFilter.Item2);
+
                 if (SortPriceAscending)
-                    return _ServiceList.OrderBy(item => Double.Parse(item.CostWithDiscount)).ToList();
+                    return FilteredServiceList.OrderBy(item => Double.Parse(item.CostWithDiscount)).ToList();
                 else
-                    return _ServiceList.OrderByDescending(item => Double.Parse(item.CostWithDiscount)).ToList();
+                    return FilteredServiceList.OrderByDescending(item => Double.Parse(item.CostWithDiscount)).ToList();
             }
             set { _ServiceList = value; }
         }
@@ -121,6 +157,14 @@ namespace AutoService
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             SortPriceAscending = ((sender as RadioButton).Tag.ToString() == "1");
+        }
+
+        private void DiscountFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CurrentDiscountFilter = Tuple.Create(
+                FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item2,
+                FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item3
+            );
         }
     }
 }

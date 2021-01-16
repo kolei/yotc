@@ -10,8 +10,8 @@
         + обратная связь с окном (INotifyPropertyChanged)
         + условное отображение кнопок в панели и в *DataGrid*-е
     - ~~Макет "плиткой"~~
-    - [Сортировка](#Сортировка)
-    - Фильтры
+    + [Сортировка](#Сортировка)
+    - [Фильтры](#Фильтры)
     - Поиск (по нескольким полям)
     - Количество отображаемых/всего записей
     - Удаление (с проверкой продаж)
@@ -833,5 +833,121 @@ public List<Service> ServiceList {
 
 ---
 
-Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.
+### Фильтры
 
+>Реализуйте фильтрацию списка услуг по размеру скидки. В ***выпадающем списке*** для фильтрации должны быть следующие варианты: от 0 до 5%, от 5% до 15%, от 15% до 30%, от 30% до 70%, от 70% до 100%, где нижняя граница включается в поиск, а верхняя -нет (min <= x < max). Например, услуга со скидкой 30% будет в диапазоне от 30% до 70%, а не от 15% до 30%. Должна быть возможность сбросить параметры фильтрации (например, с помощью выбора значения “Все”). Фильтрация должна работать в реальном времени (то есть без необходимости нажатия кнопки “найти”).
+
+Данные для *выпадающего списка* можно получать разными способами. В предыдущем варианте данные мы брали из таблицы словаря, ниже мы этот вариант рассмотрим и в рамках этой методички. 
+
+Но пока делаем по текущему заданию: список мы должны создать вручную. Причем в этом списке должны храниться и строка, для отображения в *выпадающем списке*, и граничные условия для фильтрации, т.е 3 значения.
+
+Можно под это дело создать отдельный класс, но мы не будем плодить лишних сущностей, а реализуем с помощью кортежей.
+
+[вставить ссылку на лекцию в ОАП]: //TODO
+
+Для начала нужно создать этот список в коде (главное окно):
+
+```cs
+private List<Tuple<string, float, float>> FilterByDiscountValuesList = 
+    new List<Tuple<string, float, float>>() {
+        Tuple.Create("Все записи", 0f, 1f),
+        Tuple.Create("от 0% до 5%", 0f, 0.05f),
+        Tuple.Create("от 5% до 15%", 0.05f, 0.15f),
+        Tuple.Create("от 15% до 30%", 0.15f, 0.3f),
+        Tuple.Create("от 30% до 70%", 0.3f, 0.7f),
+        Tuple.Create("от 70% до 100%", 0.7f, 1f)
+    };
+```
+
+Команда `new List<Tuple<...>>()` создает список, элементами которого являются кортежи. Каждый кортеж состоит из строки и двух чисел. В фигурных скобках после создания списка сразу вводятся значения этого списка.
+
+Так как для выпадающего списка нам нужен список строк, то пишем публичный геттер для этого списка:
+
+```cs
+public List<string> FilterByDiscountNamesList {
+    get {
+        return FilterByDiscountValuesList
+            .Select(item => item.Item1)
+            .ToList();
+    }
+}
+```
+
+Метод *Select* возвращает только указанные элементы объекта - в нашем случае первый элемент кортежа.
+
+В разметку главного окна в панель над таблицей добавляем элемент выпадающего списка:
+
+```xml
+<Label Content="Фильтр по скидке: "
+        Margin="10,0,0,0"
+        VerticalAlignment="Center"/>
+<ComboBox
+    Name="DiscountFilterComboBox"
+    SelectedIndex="0"
+    SelectionChanged="DiscountFilterComboBox_SelectionChanged"
+    ItemsSource="{Binding FilterByDiscountNamesList}"/>
+
+```
+
+Обратите внимание, в метке перед выпадающим списком я добавил границу слева, чтобы визуально отделить от радиокнопок. 
+
+>Атрибут *Margin* может содержать 1, 2 или 4 цифры, разделенные запятыми.
+>* 1 цифра - размер границы со всех сторон элемента;
+>* 2 цифры - одинаковые границы слева/справа и сверху/снизу;
+>* 4 цифры - разные границы слева, сверху, справа, снизу
+
+**SelectedIndex** в выпадающем списке означает, что по-умолчанию будет выбран указанный элемент списка.
+
+Для хранения **текущего** значения фильтра объявляем приватное свойство и геттер/сеттер для него:
+
+```cs
+private Tuple<float, float> _CurrentDiscountFilter = Tuple.Create(float.MinValue, float.MaxValue);
+
+public Tuple<float, float> CurrentDiscountFilter { 
+    get
+    {
+        return _CurrentDiscountFilter;
+    }
+    set
+    {
+        _CurrentDiscountFilter = value;
+        if (PropertyChanged != null)
+        {
+            // при изменении фильтра список перерисовывается
+            PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+        }
+    }
+}
+
+```
+
+В обработчике *DiscountFilterComboBox_SelectionChanged* задаем значения фильтра:
+
+```cs
+private void DiscountFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    CurrentDiscountFilter = Tuple.Create(
+        FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item2,
+        FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item3
+    );
+}
+```
+
+И переписываем геттер списка сервисов:
+
+```cs
+var FilteredServiceList = _ServiceList.FindAll(item =>
+    item.DiscountFloat >= CurrentDiscountFilter.Item1 &&
+    item.DiscountFloat < CurrentDiscountFilter.Item2);
+
+if (SortPriceAscending)
+    return FilteredServiceList.OrderBy(item => Double.Parse(item.CostWithDiscount)).ToList();
+else
+    return FilteredServiceList.OrderByDescending(item => Double.Parse(item.CostWithDiscount)).ToList();
+```
+
+Т.е. сначала мы выбираем (FindAll) элементы списка удовлетворяющие условию, а затем сортируем получившийся список.
+
+---
+
+Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.

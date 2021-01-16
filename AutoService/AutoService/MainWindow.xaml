@@ -48,7 +48,8 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Label Content="Цена: "/>
+                <Label Content="Цена: "
+                       VerticalAlignment="Center"/>
                 <RadioButton 
                     GroupName="Price"
                     Tag="1"
@@ -62,6 +63,16 @@
                     Content="по убыванию" 
                     Checked="RadioButton_Checked"
                     VerticalContentAlignment="Center"/>
+
+                <Label Content="Фильтр по скидке: "
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Center"/>
+                <ComboBox
+                    Name="DiscountFilterComboBox"
+                    SelectedIndex="0"
+                    SelectionChanged="DiscountFilterComboBox_SelectionChanged"
+                    ItemsSource="{Binding FilterByDiscountNamesList}"/>
+
             </StackPanel>
             
             <DataGrid 

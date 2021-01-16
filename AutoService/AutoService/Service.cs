@@ -30,6 +30,12 @@ namespace AutoService
         public Nullable<double> Discount { get; set; }
         public string MainImagePath { get; set; }
     
+        public float DiscountFloat {
+            get {
+                return Convert.ToSingle( Discount ?? 0 );
+            }
+        }
+
         public Uri ImageUri {
             get { 
                 return new Uri(Path.Combine(Environment.CurrentDirectory, MainImagePath));
