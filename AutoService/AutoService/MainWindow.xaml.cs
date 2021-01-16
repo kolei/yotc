@@ -18,6 +18,56 @@ using AutoService.windows;
 
 namespace AutoService
 {
+
+    public partial class Service
+    {
+        public float DiscountFloat
+        {
+            get
+            {
+                return Convert.ToSingle(Discount ?? 0);
+            }
+        }
+        public Uri ImageUri
+        {
+            get
+            {
+                return new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, MainImagePath));
+            }
+        }
+        public Boolean HasDiscount
+        {
+            get
+            {
+                return Discount > 0;
+            }
+        }
+
+        public string CostString
+        {
+            get
+            {
+                return Cost.ToString("#.##");
+            }
+        }
+
+        public string CostWithDiscount
+        {
+            get
+            {
+                return (Cost * Convert.ToDecimal(1 - Discount ?? 0)).ToString("#.##");
+            }
+        }
+
+        public string CostTextDecoration
+        {
+            get
+            {
+                return HasDiscount ? "Strikethrough" : "None";
+            }
+        }
+
+    }
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>

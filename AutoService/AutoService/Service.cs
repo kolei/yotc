@@ -11,7 +11,6 @@ namespace AutoService
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
 
     public partial class Service
     {
@@ -30,50 +29,6 @@ namespace AutoService
         public Nullable<double> Discount { get; set; }
         public string MainImagePath { get; set; }
     
-        public double DiscountFloat {
-            get {
-                return Discount ?? 0;
-            }
-        }
-
-        public Uri ImageUri {
-            get { 
-                return new Uri(Path.Combine(Environment.CurrentDirectory, MainImagePath));
-            }
-        }
-
-        public Boolean HasDiscount
-        {
-            get
-            {
-                return Discount > 0;
-            }
-        }
-
-        public string CostString
-        {
-            get
-            {
-                return Cost.ToString("#.##");
-            }
-        }
-
-        public string CostWithDiscount
-        {
-            get
-            {
-                return (Cost * Convert.ToDecimal(1 - Discount ?? 0)).ToString("#.##");
-            }
-        }
-
-        public string CostTextDecoration
-        {
-            get
-            {
-                return HasDiscount ? "Strikethrough" : "None";
-            }
-        }
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientService> ClientService { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
