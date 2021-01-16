@@ -845,7 +845,19 @@ public List<Service> ServiceList {
 
 [вставить ссылку на лекцию в ОАП]: //TODO
 
+Так как поле *Discount* в таблице нуллабельное, то в модели **Service** надо добавить вычисляемое поле, которое разнуливает скидку и, заодно, конвертирует во *float* (я сразу не посмотрел какого типа поле в таблице, а потом лень стало переделывать, но вы сразу всё делайте в *double*)
+
+```cs
+public float DiscountFloat {
+    get {
+        return Convert.ToSingle( Discount ?? 0 );
+    }
+}
+```
+
 Для начала нужно создать этот список в коде (главное окно):
+
+>Вместо *float* используйте *double*
 
 ```cs
 private List<Tuple<string, float, float>> FilterByDiscountValuesList = 

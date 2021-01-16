@@ -30,9 +30,9 @@ namespace AutoService
         public Nullable<double> Discount { get; set; }
         public string MainImagePath { get; set; }
     
-        public float DiscountFloat {
+        public double DiscountFloat {
             get {
-                return Convert.ToSingle( Discount ?? 0 );
+                return Discount ?? 0;
             }
         }
 
