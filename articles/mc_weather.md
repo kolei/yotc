@@ -5,147 +5,46 @@
 * по сети получить погоду для текущей локации
 * отобразить погоду на форме
 
+## Начало
+
+Создайте новый проект (*Empty Activity*)
+
 ## Получение текущей локации
-
-### Стандартные средства
-
-[Тут](https://developers.google.com/android/reference/com/google/android/gms/location/package-summary) описаны стандартные интерфейсы для работы с геолокацией
-
-
-[На основе этого примера можно посмотреть как это работает](https://en.proft.me/2019/01/3/how-get-location-latitude-longitude-android-kotlin/)
-
-1. В манифест добавляем разрешения для работы с геолокацией  
-```
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-```
-
-![](../img/as025.png)
-
-2. В build.graddle (Module: app) добавляем зависимость  
-```
-implementation 'com.google.android.gms:play-services-location:11.8.0'
-```
-
-![](/img/as026.png)
-
-
-Полный текст программы:
-
-```kt
-package com.example.wheather
-
-import android.Manifest
-import android.app.AlertDialog
-import android.content.pm.PackageManager
-import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import kotlinx.android.synthetic.main.activity_main.*
-
-class MainActivity : AppCompatActivity() {
-
-    var fusedLocationClient: FusedLocationProviderClient? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        // инициализируем объект
-        fusedLocationClient = LocationServices.
-            getFusedLocationProviderClient(this)
-
-        // запрашиваем разрешение
-        if (checkPermission(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION)) 
-        {
-            fusedLocationClient?.lastLocation?.
-                addOnSuccessListener(this,
-                    // Got last known location. In some rare
-                    // situations this can be null.
-                    {location : Location? ->
-                        // полученные координаты выводим на экран
-                        if(location == null) {
-                            textView.text = "location == null"
-                        } else location.apply {
-                            textView.text = location.toString()
-                        }
-                    })
-        }
-    }
-
-    private fun checkPermission(vararg perm:String) : Boolean {
-        val PERMISSION_ID = 42
-
-        val havePermissions = perm.toList().all {
-            ContextCompat.checkSelfPermission(this,it) ==
-                    PackageManager.PERMISSION_GRANTED
-        }
-
-        if (!havePermissions) {
-            if(perm.toList().any {
-                ActivityCompat.
-                    shouldShowRequestPermissionRationale(this, it)
-            }){
-                val dialog = AlertDialog.Builder(this)
-                    .setTitle("Permission")
-                    .setMessage("Permission needed!")
-                    .setPositiveButton("OK", {id, v ->
-                        ActivityCompat.requestPermissions(
-                            this, perm, PERMISSION_ID)
-                    })
-                    .setNegativeButton("No", {id, v -> })
-                    .create()
-                dialog.show()
-            } else {
-                ActivityCompat.requestPermissions(this, perm, PERMISSION_ID)
-            }
-            return false
-        }
-        return true
-    }
-}
-```
 
 ### Сторонние библиотеки
 
-В стандартной реализации, как обычно, слишком много букв, к счастью есть [библиотека](https://github.com/BirjuVachhani/locus-android), в которой вся рутина скрыта:
+В стандартной реализации геолокации слишком много букв, к счастью есть [библиотека](https://github.com/BirjuVachhani/locus-android), в которой вся рутина скрыта:
 
-1. Добавляем репозиторий в build.graddle (Project) ()
+1. Добавляем репозиторий в build.graddle (Project) (в ветку *allprojects* -> *repositories*)
 
-```
-maven { url 'https://jitpack.io' }
-```
+    ```
+    maven { url 'https://jitpack.io' }
+    ```
 
-![](/img/as027.png)
+    ![](../img/as027.png)
 
 
 2. Добавляем зависимости в build.graddle (Module app)
 
-```
-implementation 'com.google.android.gms:play-services-location:17.0.0'
-implementation 'com.github.BirjuVachhani:locus-android:3.0.1'
-```
+    ```
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.github.BirjuVachhani:locus-android:3.0.1'
+    ```
 
-![](/img/as028.png)
+    ![](../img/as028.png)
 
 
 3. В конструктор добавляем запрос геолокации:
 
-```kt
-Locus.getCurrentLocation(this) { result ->
-    result.location?.let {
-        tv.text = "${it.latitude}, ${it.longitude}"
-    } ?: run {
-        tv.text = result.error?.message
+    ```kt
+    Locus.getCurrentLocation(this) { result ->
+        result.location?.let {
+            tv.text = "${it.latitude}, ${it.longitude}"
+        } ?: run {
+            tv.text = result.error?.message
+        }
     }
-}
-```
+    ```
 
 
 Полный текст программы:
