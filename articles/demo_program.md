@@ -992,25 +992,23 @@ else
 
 При поиске в описании сервиса (Description) нужно учитывать, что поле нуллабельное, т.е. написать для него геттер:
 
-<pre style="user-select: none;">
+```cs
 public string DescriptionString
 {
     get {
         return Description ?? "";
     }
 }
-</pre>
+```
 
 И в геттере для *ServiceList* добавить фильтр:
 
-<div onmousedown="return false;" onselectstart="return false;">
-<pre>
+```cs
 if (SearchFilter != "")
     FilteredServiceList = FilteredServiceList.Where(item =>
         item.Title.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1 ||
         item.DescriptionString.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1).ToList();
-</pre>
-</div>
+```
 
 Здесь метод *Where* фильтрует список по условию.
 
