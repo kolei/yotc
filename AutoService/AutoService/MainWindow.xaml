@@ -73,6 +73,13 @@
                     SelectionChanged="DiscountFilterComboBox_SelectionChanged"
                     ItemsSource="{Binding FilterByDiscountNamesList}"/>
 
+                <Label Content="Поиск: "
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Center"/>
+                <TextBox
+                    x:Name="SearchTextBox"
+                    KeyUp="SearchTextBox_KeyUp"
+                    Width="200"/>
             </StackPanel>
             
             <DataGrid 

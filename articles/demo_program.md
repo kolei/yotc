@@ -988,8 +988,30 @@ else
 
 >... необходимо добавить возможность поиска услуг по названию и описанию товара. Поиск должен работать в реальном времени (то есть без необходимости нажатия кнопки “найти”).
 
-Тут всё просто: текстовое поле для фильтра и по событию ввода символа запоминать строку фильтра и перерисовывать список услуг.
+Тут всё просто: текстовое поле (*TextBox*) для фильтра и по событию ввода символа (*KeyUp*) запоминать строку фильтра и перерисовывать список услуг.
 
+При поиске в описании сервиса (Description) нужно учитывать, что поле нуллабельное, т.е. написать для него геттер:
 
+<pre style="user-select: none;">
+public string DescriptionString
+{
+    get {
+        return Description ?? "";
+    }
+}
+</pre>
+
+И в геттере для *ServiceList* добавить фильтр:
+
+<pre style="user-select: none;">
+if (SearchFilter != "")
+    FilteredServiceList = FilteredServiceList.Where(item =>
+        item.Title.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1 ||
+        item.DescriptionString.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1).ToList();
+</pre>
+
+Здесь метод *Where* фильтрует список по условию.
+
+В условии мы ищем вхождение строки фильтра в названии или описании сервиса. Метод *IndexOf* возвращает позицию подстроки в строке и `-1`, если подстрока не найдена. Параметр `StringComparison.OrdinalIgnoreCase` включает регистронезависимый поиск.
 
 Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.

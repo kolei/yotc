@@ -28,6 +28,14 @@ namespace AutoService
                 return Convert.ToSingle(Discount ?? 0);
             }
         }
+
+        public string DescriptionString
+        {
+            get {
+                return Description ?? "";
+            }
+        }
+
         public Uri ImageUri
         {
             get
@@ -127,6 +135,11 @@ namespace AutoService
                     item.DiscountFloat >= CurrentDiscountFilter.Item1 &&
                     item.DiscountFloat < CurrentDiscountFilter.Item2);
 
+                if (SearchFilter != "")
+                    FilteredServiceList = FilteredServiceList.Where(item =>
+                        item.Title.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1 ||
+                        item.DescriptionString.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1).ToList();
+
                 if (SortPriceAscending)
                     return FilteredServiceList.OrderBy(item => Double.Parse(item.CostWithDiscount)).ToList();
                 else
@@ -215,6 +228,29 @@ namespace AutoService
                 FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item2,
                 FilterByDiscountValuesList[DiscountFilterComboBox.SelectedIndex].Item3
             );
+        }
+
+        private string _SearchFilter = "";
+        public string SearchFilter
+        {
+            get
+            {
+                return _SearchFilter;
+            }
+            set
+            {
+                _SearchFilter = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+                    // PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+                }
+            }
+        }
+
+        private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            SearchFilter = SearchTextBox.Text;
         }
     }
 }
