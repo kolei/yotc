@@ -82,7 +82,8 @@
                     Width="200"/>
             </StackPanel>
             
-            <DataGrid 
+            <DataGrid
+                x:Name="MainDataGrid"
                 Grid.Row="1"
                 CanUserAddRows="false"
                 CanUserSortColumns="False"

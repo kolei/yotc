@@ -145,7 +145,11 @@ namespace AutoService
                 else
                     return FilteredServiceList.OrderByDescending(item => Double.Parse(item.CostWithDiscount)).ToList();
             }
-            set { _ServiceList = value; }
+            set { 
+                _ServiceList = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+            }
         }
 
         private Boolean _IsAdminMode = false;
@@ -209,7 +213,14 @@ namespace AutoService
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var item = MainDataGrid.SelectedItem as Service;
+            if (item.ClientService.Count > 0) {
+                MessageBox.Show("Нельзя удалять услугу, она уже оказана");
+                return;
+            }
+            Core.DB.Service.Remove(item);
+            Core.DB.SaveChanges();
+            ServiceList = Core.DB.Service.ToList();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
