@@ -1003,12 +1003,14 @@ public string DescriptionString
 
 И в геттере для *ServiceList* добавить фильтр:
 
-<pre style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; ">
+<div style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; ">
+<pre>
 if (SearchFilter != "")
     FilteredServiceList = FilteredServiceList.Where(item =>
         item.Title.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1 ||
         item.DescriptionString.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1).ToList();
 </pre>
+</div>
 
 Здесь метод *Where* фильтрует список по условию.
 
