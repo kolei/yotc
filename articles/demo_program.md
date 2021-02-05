@@ -1003,7 +1003,7 @@ public string DescriptionString
 
 И в геттере для *ServiceList* добавить фильтр:
 
-<pre style="user-select: none;">
+<pre style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; ">
 if (SearchFilter != "")
     FilteredServiceList = FilteredServiceList.Where(item =>
         item.Title.IndexOf(SearchFilter, StringComparison.OrdinalIgnoreCase) != -1 ||
