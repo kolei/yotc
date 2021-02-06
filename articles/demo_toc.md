@@ -24,7 +24,7 @@
 
 # Содержание
 
-* ~~Диаграммы (UseCase, Sequence...)~~, к Пинешкину
+* ~~Диаграммы (UseCase, Sequence...)~~, моя тут
 * ~~ERD~~, к Ахматову
 * MSSQL
     - [Основы SQL](../articles/demo_sql.md)
