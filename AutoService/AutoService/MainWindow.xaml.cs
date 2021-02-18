@@ -40,7 +40,7 @@ namespace AutoService
         {
             get
             {
-                return new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, MainImagePath));
+                return new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, MainImagePath ?? ""));
             }
         }
         public Boolean HasDiscount
@@ -208,7 +208,12 @@ namespace AutoService
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var SelectedService = MainDataGrid.SelectedItem as Service;
+            var EditServiceWindow = new windows.ServiceWindow(SelectedService);
+            if ((bool)EditServiceWindow.ShowDialog())
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -221,11 +226,6 @@ namespace AutoService
             Core.DB.Service.Remove(item);
             Core.DB.SaveChanges();
             ServiceList = Core.DB.Service.ToList();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
@@ -262,6 +262,20 @@ namespace AutoService
         private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             SearchFilter = SearchTextBox.Text;
+        }
+
+        private void AddService_Click(object sender, RoutedEventArgs e)
+        {
+            // создаем новую услугу
+            var NewService = new Service();
+
+            var NewServiceWindow = new windows.ServiceWindow(NewService);
+            if ((bool)NewServiceWindow.ShowDialog())
+            {
+                ServiceList = Core.DB.Service.ToList();
+                PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
+            }
         }
     }
 }

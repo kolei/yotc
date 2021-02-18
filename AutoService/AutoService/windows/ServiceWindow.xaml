@@ -1,0 +1,40 @@
+﻿<Window x:Class="AutoService.windows.ServiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutoService.windows"
+        mc:Ignorable="d"
+        Title="{Binding WindowName}" MinHeight="320" Height="320" Width="600">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Source="{Binding CurrentService.ImageUri}" />
+
+        <StackPanel Grid.Column="1" Margin="5" Grid.ColumnSpan="2">
+            <Label Content="Название услуги"/>
+            <TextBox Text="{Binding CurrentService.Title}"/>
+            <Label Content="Стоимость"/>
+            <TextBox Text="{Binding CurrentService.Cost}"/>
+            <Label Content="Длительность в секундах"/>
+            <TextBox Text="{Binding CurrentService.DurationInSeconds}"/>
+            <Label Content="Описание"/>
+            <TextBox Text="{Binding CurrentService.Description}"/>
+            <Label Content="Скидка"/>
+            <TextBox Text="{Binding CurrentService.Discount}"/>
+
+            <Button 
+                Margin="5"
+                x:Name="GetImageButton" 
+                Content="Выберите файл изображения" 
+                Click="GetImageButton_Click"/>
+
+            <Button 
+                Margin="5"
+                x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

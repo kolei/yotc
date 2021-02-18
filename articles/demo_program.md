@@ -15,7 +15,7 @@
     + [Поиск](#Поиск) (по нескольким полям)
     + [Количество отображаемых записей](#Количество-отображаемых-записей)
     + [Удаление](#Удаление) (с проверкой)
-* Добавление/редактирование 
+* [Добавление и редактирование услуг](#Добавление-и-редактирование-услуг)
     - проверка на дубль по названию
 * Дополнительные фото (CRUD)
 * Запись на услугу / продажа
@@ -1075,5 +1075,173 @@ private void DeleteButton_Click(object sender, RoutedEventArgs e)
 }
 ```
 
+## Добавление и редактирование услуг
 
-Реализация действий для кнопок Добавить/Редактирвать/Удалить будет ниже.
+Для добавления и редактирования мы будем использовать одно и то же окно. Название окна будем вычислять по наличию ID у услуги (у новой записи это поле = 0)
+
+1. Создайте новое окно: *ServiceWindow*
+
+2. В классе окна *ServiceWindow* добавьте свойство *CurrentService*, в котором будет храниться добавляемый/редактируемый экземпляр услуги:
+
+    ```cs
+    public Service CurrentService { get; set; }
+    ```
+
+    И геттер для названия окна:
+
+    ```cs
+    public string WindowName {
+        get {
+            return CurrentService.ID == 0 ? "Новая услуга" : "Редактирование услуги";
+        }
+    }
+    ```
+
+3. В конструктор окна добавьте параметр типа *Service* и присвойте его ранее объявленному свойству:
+
+    ```cs
+    public ServiceWindow(Service service){
+        ...
+        CurrentService = service;
+    }
+    ```
+
+4. В разметку окна добавьте *StackPanel* с границами (чтобы визуальные компоненты не прилипали к границам окна)
+
+    ```xml
+    <StackPanel Margin="5">
+    </StackPanel>
+    ```
+
+    И добавьте биндинг в название окна:
+
+    ```
+    Title="{Binding WindowName}"
+    ```
+
+5. В *StackPanel* добавьте редактируемые поля из таблицы **Service** по шаблону:
+
+    ```xml
+    <Label Content="Наименование услуги"/>
+    <TextBox Text="{Binding CurrentService.Title}"/>
+    ...
+    ```
+
+    И кнопки для выбора изображения и сохранения услуги.
+
+6. Для смены картинки воспользуемся стандартным диалогом Windows. В обработчике клика кнопки выбора изображения откройте диалог выбора файлов. При успешном выборе присвойте полученную картинку свойству *MainImagePath*:
+
+    ```cs
+    private void GetImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog GetImageDialog = new OpenFileDialog();
+        // задаем фильтр для выбираемых файлов
+        // до символа "|" идет произвольный текст, а после него шаблоны файлов раздеренные точкой с запятой
+        GetImageDialog.Filter = "Файлы изображений: (*.png, *.jpg)|*.png;*.jpg";
+        // чтобы не искать по всему диску задаем начальный каталог
+        GetImageDialog.InitialDirectory = Environment.CurrentDirectory;
+        if (GetImageDialog.ShowDialog() == true)
+        {
+            // перед присвоением пути к картинке обрезаем начало строки, т.к. диалог возвращает полный путь
+            // (тут конечно еще надо проверить есть ли в начале Environment.CurrentDirectory)
+            CurrentService.MainImagePath = GetImageDialog.FileName.Substring(Environment.CurrentDirectory.Length+1);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("CurrentService"));
+            }
+        }
+    }
+    ```
+
+7. Сохраните изменения при клике на кнопку **Сохранить**
+
+    >По ТЗ перед сохранением нужно проверить Стоимость (>0) и скидку (0..100)
+
+    ```cs
+    private void SaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (CurrentService.Cost <= 0)
+        {
+            MessageBox.Show("Стоимость услуги должна быть больше ноля");
+            return;
+        }
+
+        if (CurrentService.Discount < 0 || CurrentService.Discount>1)
+        {
+            MessageBox.Show("Скидка на услугу должна быть в диапазоне от 0 до 1");
+            return;
+        }
+
+        // если запись новая, то добавляем ее в список
+        if (CurrentService.ID == 0)
+            classes.Core.DB.Service.Add(CurrentService);
+
+        // сохранение в БД
+        try
+        {
+            classes.Core.DB.SaveChanges();
+        }
+        catch
+        { 
+        }
+        DialogResult = true;
+    }
+    ```
+
+8. В главном окне в обработчике кнопки редактирования услуги открываем окно с текущей услугой:
+
+    ```cs
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        var SelectedService = MainDataGrid.SelectedItem as Service;
+        var EditServiceWindow = new windows.ServiceWindow(SelectedService);
+        if ((bool)EditServiceWindow.ShowDialog())
+        {
+            // при успешном завершении не забываем перерисовать список услуг
+            PropertyChanged(this, new PropertyChangedEventArgs("ServiceList"));
+            // и еще счетчики - их добавьте сами
+        }
+    }
+    ```
+
+9. И в обработчике кнопки создания услуги создаем новую услугу и открываем в том же окне:
+
+    ```cs
+    private void AddService_Click(object sender, RoutedEventArgs e)
+    {
+        // создаем новую услугу
+        var NewService = new Service();
+
+        var NewServiceWindow = new windows.ServiceWindow(NewService);
+        if ((bool)NewServiceWindow.ShowDialog())
+        {
+            // список услуг нужно перечитать с сервера
+            ServiceList = Core.DB.Service.ToList();
+            PropertyChanged(this, new PropertyChangedEventArgs("FilteredProductsCount"));
+            PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
+        }
+    }
+    ```
+
+    При добавлении может выскочить исключение, если путь к картинке нуллабельный. Исправьте геттер ImageUri (добавьте разнуливание):
+
+    ```cs
+    public Uri ImageUri
+    {
+        get
+        {
+            return new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, MainImagePath ?? ""));
+        }
+    }
+    ```
+
+В ТЗ кода 1.1 нужно было вывести ID редактируемой записи, но не показывать его для новой. Для этого нужно нарисовать геттер *NewProduct*, который будет скрывать **StackPanel**, если `ID == 0`. Это реализуйте самостоятельно. Пример управления видимостью компонентов есть в реализации режима администратора.
+
+```xml
+<StackPanel Orientation="Horizontal" Visibility="{Binding NewProduct}">
+    <Label Content="Идентификатор услуги: "/>
+    <Label Content="{Binding CurrentService.ID}"/>
+</StackPanel>
+```
+
+Проверку на дубль тоже реализуйте самостоятельно. Намекну, что можно в конструктор окна передать вторым параметром полный список услуг и перед сохранением услуги искать в нем  название.

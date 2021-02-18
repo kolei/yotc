@@ -26,9 +26,10 @@
             Margin="5"
             VerticalAlignment="Bottom">
             <Button
+                x:Name="AddService"
                 Content="Добавить услугу"
                 Visibility="{Binding AdminVisibility}"
-                Click="Button_Click"/>
+                Click="AddService_Click"/>
             <Button
                 Content="{Binding AdminModeCaption}"
                 Name="AdminButton"
