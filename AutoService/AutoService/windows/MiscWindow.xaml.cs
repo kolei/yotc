@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,6 +62,14 @@ namespace AutoService.windows
                     ResponseTextBox.Text += $"{item.Adress}\n";
                 }
             }
+        }
+
+        private void RegexButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Regex.IsMatch(EmailTextBox.Text, @"^\w+@\w+\.\w{2,}$", RegexOptions.IgnoreCase))
+                ResponseTextBox.Text = "валидная почта";
+            else
+                ResponseTextBox.Text = "НЕ валидная почта";
         }
     }
 }

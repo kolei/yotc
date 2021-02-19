@@ -13,9 +13,14 @@
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Vertical">
             <Button x:Name="GetButton" Click="GetButton_Click" Content="Получить данные с сервера"/>
+            <Button x:Name="RegexButton" Click="RegexButton_Click" Content="Проверит e-mail"/>
         </StackPanel>
-        <TextBlock x:Name="ResponseTextBox" Grid.Column="1" 
-                   TextWrapping="Wrap"
-                   Background="AliceBlue"/>
+        <StackPanel Grid.Column="1">
+            <TextBox x:Name="EmailTextBox" Text="kolei@mail.ru"/>
+            <TextBlock 
+                x:Name="ResponseTextBox" 
+                TextWrapping="Wrap"
+                Background="AliceBlue"/>
+        </StackPanel>
     </Grid>
 </Window>
