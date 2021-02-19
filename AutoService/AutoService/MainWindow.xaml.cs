@@ -277,5 +277,11 @@ namespace AutoService
                 PropertyChanged(this, new PropertyChangedEventArgs("ProductsCount"));
             }
         }
+
+        private void MiscButton_Click(object sender, RoutedEventArgs e)
+        {
+            var NewMiscWindow = new windows.MiscWindow();
+            NewMiscWindow.ShowDialog();
+        }
     }
 }

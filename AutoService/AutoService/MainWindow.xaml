@@ -26,6 +26,10 @@
             Margin="5"
             VerticalAlignment="Bottom">
             <Button
+                x:Name="MiscButton"
+                Content="Разное"
+                Click="MiscButton_Click"/>
+            <Button
                 x:Name="AddService"
                 Content="Добавить услугу"
                 Visibility="{Binding AdminVisibility}"
