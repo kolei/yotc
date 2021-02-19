@@ -14,6 +14,7 @@
         <StackPanel Orientation="Vertical">
             <Button x:Name="GetButton" Click="GetButton_Click" Content="Получить данные с сервера"/>
             <Button x:Name="RegexButton" Click="RegexButton_Click" Content="Проверит e-mail"/>
+            <Button x:Name="TryPostButton" Click="TryPostButton_Click" Content="Try POST"/>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBox x:Name="EmailTextBox" Text="kolei@mail.ru"/>

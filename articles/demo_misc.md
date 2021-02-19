@@ -26,6 +26,8 @@ http://kolei.ru/api/<ваш логин>/<название таблицы>
 
 ### Интернет запросы
 
+**GET-запросы**
+
 Для посылки простого GET-запроса (и получения данных) можно вопользоваться WebClient-ом:
 
 ```cs
@@ -50,7 +52,7 @@ C# может автоматически сгенерировать классы
 
 ![](../img/demo70.png)
 
-### Десериализация
+**Десериализация полученных данных**
 
 * Откройте вашу ссылку (у меня это `http://kolei.ru/api/ekolesnikov/Sklad`) в браузере. 
 * Скопируйте полученный текст в буфер обмена.
@@ -88,6 +90,49 @@ C# может автоматически сгенерировать классы
         }
     }
     ```
+
+**POST-запросы**
+
+POST-запросы отправляются похожим образом, методом *UploadValues*, которому в параметрах передают пары ключ-значение с помощью коллекции *NameValueCollection*:
+
+```cs
+var webClient = new WebClient();
+
+// Создаём коллекцию параметров
+var pars = new NameValueCollection();
+
+// Добавляем необходимые параметры в виде пар ключ, значение
+pars.Add("name", "kei");
+
+// Посылаем параметры на сервер
+// Может быть ответ в виде массива байт
+var ResponseBuffer = webClient.UploadValues("http://kolei.ru/api/login", pars);
+var ResponseString = Encoding.UTF8.GetString(ResponseBuffer);
+ResponseTextBox.Text = ResponseString;
+```
+
+По-умолчанию `content-type = application/x-www-form-urlencoded`. Если в АПИ указан другой тип (в последнее время стал популярен `application/json`), то можно переопределить его:
+
+```cs
+var webClient = new WebClient();
+
+// переопределяем тип контента POST-запроса
+webClient.Headers["Content-type"] = "application/json";
+
+var jsonData = "{\"test\":true}";
+
+// Посылаем ДАННЫЕ на сервер
+// Может быть ответ в виде массива байт
+var ResponseBuffer = webClient.UploadData(
+    "http://kolei.ru/api/login", 
+    "POST", 
+    Encoding.Default.GetBytes(jsonData));
+
+var ResponseString = Encoding.UTF8.GetString(ResponseBuffer);
+ResponseTextBox.Text = ResponseString;
+```
+
+Точка входа `http://kolei.ru/api/login` возвращает content-type, который был в исходном запросе.
 
 ## Проверка электронной почты
 

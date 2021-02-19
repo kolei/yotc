@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Collections.Specialized;
 
 namespace AutoService.windows
 {
@@ -70,6 +71,18 @@ namespace AutoService.windows
                 ResponseTextBox.Text = "валидная почта";
             else
                 ResponseTextBox.Text = "НЕ валидная почта";
+        }
+
+        private void TryPostButton_Click(object sender, RoutedEventArgs e)
+        {
+            var webClient = new WebClient();
+            webClient.Headers["Content-type"] = "application/json";
+
+            // Посылаем параметры на сервер
+            // Может быть ответ в виде массива байт
+            var ResponseBuffer = webClient.UploadData("http://kolei.ru/api/login", "POST", Encoding.Default.GetBytes("{\"test\":true}"));
+            var ResponseString = Encoding.UTF8.GetString(ResponseBuffer);
+            ResponseTextBox.Text = ResponseString;
         }
     }
 }
