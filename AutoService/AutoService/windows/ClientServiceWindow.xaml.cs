@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace AutoService
 {
@@ -31,11 +32,40 @@ namespace AutoService
         {
             get
             {
-                return StartTime.ToString();
+                // в принципе то же самое вернет и просто ToString(), но его значение зависит
+                // от культурной среды, поэтому лучше задать жестко
+                return StartTime.ToString("dd.MM.yyyy hh:mm:ss");
             }
             set
             {
-                StartTime = new DateTime(2021, 2, 25, 9, 9, 9);
+                // в круглых скобках регуляного выражения те значения, которые попадут в match.Groups
+                // точка спецсимвол, поэтому ее экранируем
+                // \s - пробел (любой разделитель)
+                // \d - цифра
+                // модификатор "+" означает что должен быть как минимум один элемент (можно больше)
+                Regex regex = new Regex(@"(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)");
+                Match match = regex.Match( value );
+                if (match.Success)
+                {
+                    try
+                    {
+                        StartTime = new DateTime(
+                            Convert.ToInt32(match.Groups[3].Value),
+                            Convert.ToInt32(match.Groups[2].Value),
+                            Convert.ToInt32(match.Groups[1].Value),
+                            Convert.ToInt32(match.Groups[4].Value),
+                            Convert.ToInt32(match.Groups[5].Value),
+                            Convert.ToInt32(match.Groups[6].Value)
+                            );
+                    }
+                    catch {
+                        MessageBox.Show("Не верный формат даты/времени");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Не верный формат даты/времени");
+                }
             }
         }
     }
