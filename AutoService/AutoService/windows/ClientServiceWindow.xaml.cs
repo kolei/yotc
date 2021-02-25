@@ -93,5 +93,28 @@ namespace AutoService.windows
             CurrentClientService = new ClientService();
             CurrentClientService.StartTime = DateTime.Now;
         }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            // сохранение в БД
+            try
+            {
+                if (CurrentClientService.Client == null)
+                    throw new Exception("Не выбран клиент");
+
+                if (CurrentClientService.Service == null)
+                    throw new Exception("Не выбрана услуга");
+
+                classes.Core.DB.ClientService.Add(CurrentClientService);
+                classes.Core.DB.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            DialogResult = true;
+        }
     }
 }

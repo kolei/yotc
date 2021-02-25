@@ -33,6 +33,10 @@
             <TextBox Text="{Binding CurrentClientService.StartTimeText}"/>
             <Label Content="Комментарий"/>
             <TextBox Text="{Binding CurrentClientService.Comment}"/>
+            <Button
+                x:Name="SaveButton"
+                Content="Сохранить"
+                Click="SaveButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
