@@ -18,7 +18,7 @@
 * [Добавление и редактирование услуг](#Добавление-и-редактирование-услуг)
     - проверка на дубль по названию
 * Дополнительные фото (CRUD)
-* Запись на услугу / продажа
+* [Запись на услугу](#Запись-на-услугу)
 * Ближайшие записи (окно)
     - выделение цветом по времени
     - автообновление 
@@ -1249,3 +1249,87 @@ private void DeleteButton_Click(object sender, RoutedEventArgs e)
 ```
 
 Проверку на дубль тоже реализуйте самостоятельно. Намекну, что можно в конструктор окна передать вторым параметром полный список услуг и перед сохранением услуги искать в нем  название.
+
+## Запись на услугу
+
+Здесь нужно сделать добавление записи в таблицу **ClientService**
+
+Создание окна повторять не буду, это вы уже можете сделать сами.
+
+Рассмотрим как заполнять поля *Клиент* и *Сервис*. Эти поля словарные (это видно по структуре БД - в этих полях связи к соответствующим таблицам).
+
+1. При создании окна нужно получить списки клиентов и сервисов:
+
+    ```cs
+    public List<Client> ClientList { get; set; }
+    public ClientService CurrentClientService { get; set; }
+    public List<Service> ServiceList { get; set; }
+
+    public ClientServiceWindow(List<Service> serviceList)
+    {
+        InitializeComponent();
+        DataContext = this;
+
+        // список услуг можно передать в параметрах окна, чтобы не плодить сущностей
+        ServiceList = serviceList;
+
+        // список клиентов 
+        ClientList = classes.Core.DB.Client.ToList();
+
+        // у нас нет задачи редактировать записи на услуги, поэтому 
+        // в окне всегда создаем новую услугу
+        CurrentClientService = new ClientService();
+
+        // время записи устанавливаем текущее, чтобы меньше было править
+        CurrentClientService.StartTime = DateTime.Now;
+    }
+    ```
+
+2. Разметка окна:
+
+    ```xml
+    <StackPanel Margin="5">
+        <Label Content="Клиент"/>
+        <!-- 
+            Для выбора клиента из списка используем компонент ComboBox
+            ItemsSource - список клиентов
+            SelectedItem - сюда запомнится выбранный клиент. Обратите внимание, сохраняем
+                выбор в виртуальное поле Client
+            FullName - самописанный геттер, возвращающий полное ФИО клиента    
+        -->
+        <ComboBox 
+            ItemsSource="{Binding ClientList}"
+            SelectedItem="{Binding CurrentClientService.Client}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding FullName}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label Content="Услуга"/>
+        <!-- 
+            Выбор услуги аналогичен
+        -->
+        <ComboBox 
+            ItemsSource="{Binding ServiceList}"
+            SelectedItem="{Binding CurrentClientService.Service}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding Title}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label Content="Время записи"/>
+        <!-- 
+            Вот тут засада - в WPF нет своей реализации DateTimePicker
+            - Использовать сторонние библиотеки нам нельзя - нет интернета
+            - Использовать компонент из Windows.Form не советуют, не будет работать биндинг
+            Поэтому я реализую через строку с геттером и сеттером. 
+            В сеттере мы с помощью регулярного выражения разберем эту строку и запишем нормальную
+            дату в поле StartTime
+        -->
+        <TextBox Text="{Binding CurrentClientService.StartTimeText}"/>
+        <Label Content="Комментарий"/>
+        <TextBox Text="{Binding CurrentClientService.Comment}"/>
+    </StackPanel>
+    ```

@@ -1,0 +1,38 @@
+﻿<Window x:Class="AutoService.windows.ClientServiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutoService.windows"
+        mc:Ignorable="d"
+        Title="Запись на услугу" Height="300" Width="500">
+    <Grid>
+        <StackPanel
+           Margin="5">
+            <Label Content="Клиент"/>
+            <ComboBox 
+                ItemsSource="{Binding ClientList}"
+                SelectedItem="{Binding CurrentClientService.Client}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding FullName}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="Услуга"/>
+            <ComboBox 
+                ItemsSource="{Binding ServiceList}"
+                SelectedItem="{Binding CurrentClientService.Service}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Title}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="Время записи"/>
+            <TextBox Text="{Binding CurrentClientService.StartTimeText}"/>
+            <Label Content="Комментарий"/>
+            <TextBox Text="{Binding CurrentClientService.Comment}"/>
+        </StackPanel>
+    </Grid>
+</Window>

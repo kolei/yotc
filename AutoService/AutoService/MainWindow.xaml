@@ -12,7 +12,7 @@
         Height="450" Width="1080">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
@@ -34,6 +34,11 @@
                 Content="Добавить услугу"
                 Visibility="{Binding AdminVisibility}"
                 Click="AddService_Click"/>
+            <Button
+                x:Name="AddClientService"
+                Content="Записаться на сервис"
+                Click="AddClientService_Click"/>
+
             <Button
                 Content="{Binding AdminModeCaption}"
                 Name="AdminButton"

@@ -283,5 +283,11 @@ namespace AutoService
             var NewMiscWindow = new windows.MiscWindow();
             NewMiscWindow.ShowDialog();
         }
+
+        private void AddClientService_Click(object sender, RoutedEventArgs e)
+        {
+            var NewClientServiceWindow = new windows.ClientServiceWindow(ServiceList);
+            NewClientServiceWindow.ShowDialog();
+        }
     }
 }
